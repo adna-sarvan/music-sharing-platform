@@ -1,0 +1,28 @@
+{
+  "songs": [
+    {
+      "id": "1",
+      "title": "Starlight",
+      "artist": "The Odyssey",
+      "genre": "Electronic",
+      "duration": "3:45",
+      "cover": "https://picsum.photos/seed/1/300/300"
+    },
+    {
+      "id": "2",
+      "title": "Midnight City",
+      "artist": "Neon Lights",
+      "genre": "Pop",
+      "duration": "4:12",
+      "cover": "https://picsum.photos/seed/2/300/300"
+    },
+    {
+      "id": "3",
+      "title": "Dark Echoes",
+      "artist": "Subwoofer",
+      "genre": "Rock",
+      "duration": "5:20",
+      "cover": "https://picsum.photos/seed/3/300/300"
+    }
+  ]
+}
