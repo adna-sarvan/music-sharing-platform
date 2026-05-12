@@ -1,0 +1,139 @@
+.song-card {
+  background: var(--shnare-card);
+  border: 1px solid var(--shnare-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.song-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.04), rgba(168, 85, 247, 0.04));
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.song-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 12px 40px rgba(168, 85, 247, 0.15);
+}
+
+.song-card:hover::before {
+  opacity: 1;
+}
+
+.song-card__cover {
+  position: relative;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  overflow: hidden;
+}
+
+.song-card__cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(168, 85, 247, 0.12), rgba(236, 72, 153, 0.08));
+}
+
+.song-card__music-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--shnare-purple);
+  opacity: 0.5;
+}
+
+.song-card__play-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--shnare-gradient);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.85) translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.4);
+}
+
+.song-card:hover .song-card__play-btn {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.song-card__play-btn--playing {
+  opacity: 1 !important;
+  transform: scale(1) translateY(0) !important;
+}
+
+.song-card__play-btn:hover {
+  transform: scale(1.08) translateY(0) !important;
+}
+
+.song-card__play-btn:active {
+  transform: scale(0.96) !important;
+}
+
+.song-card__info {
+  padding: 14px 16px 16px;
+}
+
+.song-card__genre {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--shnare-purple);
+  background: rgba(168, 85, 247, 0.12);
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.song-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--shnare-text);
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-card__artist {
+  font-size: 13px;
+  color: var(--shnare-muted);
+  margin: 0 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.song-card__duration,
+.song-card__plays {
+  font-size: 12px;
+  color: var(--shnare-muted);
+}

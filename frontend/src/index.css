@@ -1,0 +1,21 @@
+:root {
+  --shnare-dark: #0d0d14;
+  --shnare-surface: #16161f;
+  --shnare-card: #1c1c28;
+  --shnare-card-hover: #222233;
+  --shnare-purple: #a855f7;
+  --shnare-blue: #38bdf8;
+  --shnare-pink: #ec4899;
+  --shnare-gradient: linear-gradient(135deg, #38bdf8, #a855f7, #ec4899);
+  --shnare-text: #f1f0ff;
+  --shnare-muted: #8888aa;
+  --shnare-border: rgba(168, 85, 247, 0.15);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--shnare-dark);
+  color: var(--shnare-text);
+  font-family: 'Inter', sans-serif;
+}
