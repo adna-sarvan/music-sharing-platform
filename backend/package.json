@@ -1,0 +1,12 @@
+{
+  "name": "music-sharing-platform-backend",
+  "version": "1.0.0",
+  "description": "Backend za music-sharing-platform koristi json-server",
+  "scripts": {
+    "start": "json-server --watch db.json --port 3001",
+    "dev": "json-server --watch db.json --port 3001"
+  },
+  "dependencies": {
+    "json-server": "^0.17.4"
+  }
+}
