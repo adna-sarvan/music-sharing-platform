@@ -5,6 +5,7 @@ import UploadPage from './pages/UploadPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import ContactPage from './pages/ContactPage';
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>

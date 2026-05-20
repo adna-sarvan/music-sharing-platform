@@ -1,0 +1,200 @@
+:root {
+  --shnare-dark: #0d0d14;
+  --shnare-surface: #16161f;
+  --shnare-card: #1c1c28;
+  --shnare-purple: #a855f7;
+  --shnare-blue: #38bdf8;
+  --shnare-pink: #ec4899;
+  --shnare-gradient: linear-gradient(135deg, #38bdf8, #a855f7, #ec4899);
+  --shnare-text: #f1f0ff;
+  --shnare-muted: #8888aa;
+  --shnare-border: rgba(168, 85, 247, 0.15);
+}
+
+.notfound {
+  min-height: 100vh;
+  background: var(--shnare-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.notfound__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.notfound__bg::before {
+  content: "";
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+}
+
+.notfound__bg::after {
+  content: "";
+  position: absolute;
+  bottom: 10%;
+  right: 10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.06) 0%, transparent 70%);
+}
+
+.notfound__content {
+  position: relative;
+  text-align: center;
+  max-width: 520px;
+}
+
+/* Visual – 404 s vinyl pločom */
+.notfound__visual {
+  margin-bottom: 40px;
+}
+
+.notfound__number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.notfound__number span {
+  font-size: clamp(5rem, 15vw, 9rem);
+  font-weight: 900;
+  background: var(--shnare-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+/* Vinyl ploča umjesto nule */
+.notfound__vinyl {
+  width: clamp(80px, 14vw, 130px);
+  height: clamp(80px, 14vw, 130px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #2a2a3a, #0d0d14);
+  border: 3px solid rgba(168, 85, 247, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spin 4s linear infinite;
+  position: relative;
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+}
+
+.notfound__vinyl::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.notfound__vinyl::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.notfound__vinyl-inner {
+  width: 38%;
+  height: 38%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(168, 85, 247, 0.4));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notfound__vinyl-center {
+  width: 35%;
+  height: 35%;
+  border-radius: 50%;
+  background: var(--shnare-dark);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Text */
+.notfound__title {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--shnare-text);
+  margin: 0 0 14px;
+  letter-spacing: -0.02em;
+}
+
+.notfound__subtitle {
+  font-size: 15px;
+  color: var(--shnare-muted);
+  line-height: 1.7;
+  margin: 0 0 40px;
+}
+
+/* Buttons */
+.notfound__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.notfound__btn {
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.notfound__btn--primary {
+  background: var(--shnare-gradient);
+  color: #fff;
+}
+
+.notfound__btn--primary:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.3);
+}
+
+.notfound__btn--ghost {
+  background: transparent;
+  border: 1px solid var(--shnare-border);
+  color: var(--shnare-muted);
+}
+
+.notfound__btn--ghost:hover {
+  border-color: rgba(168, 85, 247, 0.4);
+  color: var(--shnare-text);
+}
+
+@media (max-width: 480px) {
+  .notfound__actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .notfound__btn {
+    width: 100%;
+    max-width: 280px;
+  }
+}
