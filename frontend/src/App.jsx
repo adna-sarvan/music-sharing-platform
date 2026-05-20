@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import BrowsePage from './pages/BrowsePage';
 import UploadPage from './pages/UploadPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -10,11 +11,13 @@ function App() {
         <nav style={{ padding: '20px', display: 'flex', justifyContent: 'center', gap: '30px' }}>
           <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Istraži</Link>
           <Link to="/upload" style={{ color: '#bc13fe', textDecoration: 'none', fontWeight: 'bold' }}>+ Dodaj</Link>
+          <Link to="/profile" style={{ color: 'white', textDecoration: 'none' }}>Profil</Link>
         </nav>
 
         <Routes>
           <Route path="/" element={<BrowsePage />} />
           <Route path="/upload" element={<UploadPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </div>
     </Router>
