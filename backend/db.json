@@ -1,28 +1,23 @@
 {
-  "songs": [
+  "songs": [],
+  "users": [
     {
       "id": "1",
-      "title": "Starlight",
-      "artist": "The Odyssey",
-      "genre": "Electronic",
-      "duration": "3:45",
-      "cover": "https://picsum.photos/seed/1/300/300"
+      "name": "Admin",
+      "email": "admin@shnare.com",
+      "password": "admin123",
+      "role": "admin",
+      "createdAt": "2025-01-01T00:00:00.000Z"
     },
     {
-      "id": "2",
-      "title": "Midnight City",
-      "artist": "Neon Lights",
-      "genre": "Pop",
-      "duration": "4:12",
-      "cover": "https://picsum.photos/seed/2/300/300"
-    },
-    {
-      "id": "3",
-      "title": "Dark Echoes",
-      "artist": "Subwoofer",
-      "genre": "Rock",
-      "duration": "5:20",
-      "cover": "https://picsum.photos/seed/3/300/300"
+      "name": "Hana Jašarević",
+      "email": "hanaj@gmail.com",
+      "password": "hanaj123",
+      "role": "user",
+      "createdAt": "2026-05-22T10:20:02.495Z",
+      "id": "HEODRD1"
     }
-  ]
+  ],
+  "playlists": [],
+  "favorites": []
 }

@@ -1,0 +1,112 @@
+/* glavna navbar traka */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+    background-color: #1E1E2E;
+    border-bottom: 1px solid #2a2a3e;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    /* da bude iznad ostalog sadržaja */
+}
+
+/* logo lijevo */
+.navbar-logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: #6C3FC5;
+    text-decoration: none;
+}
+
+.navbar-logo:hover {
+    color: #5a32a3;
+}
+
+/* linkovi u sredini */
+.navbar-links {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+}
+
+.navbar-links a {
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+
+.navbar-links a:hover {
+    color: #ffffff;
+}
+
+/* + Dodaj link - malo istaknutiji */
+.navbar-links a:nth-child(2) {
+    color: #6C3FC5;
+    font-weight: 600;
+}
+
+/* desna strana - auth buttoni */
+.navbar-auth {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* ime prijavljenog korisnika */
+.navbar-username {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.navbar-username:hover {
+    color: #6C3FC5;
+}
+
+/* logout button */
+.navbar-logout {
+    padding: 8px 18px;
+    background-color: transparent;
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.navbar-logout:hover {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+/* login link */
+.navbar-login {
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+
+.navbar-login:hover {
+    color: #ffffff;
+}
+
+/* register button */
+.navbar-register {
+    padding: 8px 18px;
+    background-color: #6C3FC5;
+    color: white;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.navbar-register:hover {
+    background-color: #5a32a3;
+}
