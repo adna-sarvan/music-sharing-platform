@@ -1,0 +1,126 @@
+/* glavni wrapper za cijelu stranicu */
+.landing-container {
+    min-height: 100vh;
+    background-color: var(--shnare-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px;
+}
+
+/* hero dio - naslov i buttoni */
+.landing-hero {
+    text-align: center;
+    max-width: 700px;
+    margin-bottom: 80px;
+}
+
+.landing-title {
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--shnare-text);
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+/* šareni span u naslovu - isti efekat kao "nas" na contact stranici */
+.landing-title span {
+    background: var(--shnare-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.landing-subtitle {
+    font-size: 18px;
+    color: var(--shnare-muted);
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+/* wrapper za dva buttona */
+.landing-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* glavni button - isti gradijent kao contact btn */
+.btn-primary {
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #38bdf8, #a855f7);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* sekundarni button - border verzija */
+.btn-secondary {
+    padding: 14px 32px;
+    background-color: transparent;
+    color: var(--shnare-text);
+    border: 2px solid var(--shnare-purple);
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: var(--shnare-purple);
+    transform: translateY(-1px);
+}
+
+/* sekcija sa 3 kartice */
+.landing-features {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 1000px;
+}
+
+/* pojedinačna kartica - ista sjena kao song-card na hoveru */
+.feature-card {
+    background: var(--shnare-card);
+    border: 1px solid var(--shnare-border);
+    border-radius: 16px;
+    padding: 32px 24px;
+    width: 280px;
+    text-align: center;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(168, 85, 247, 0.4);
+    box-shadow: 0 12px 40px rgba(168, 85, 247, 0.15);
+}
+
+/* emoji ikonica na kartici */
+.feature-icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+}
+
+.feature-card h3 {
+    color: var(--shnare-text);
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    color: var(--shnare-muted);
+    font-size: 14px;
+    line-height: 1.6;
+}

@@ -1,15 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import SongCard from "../components/SongCard";
 import "./ProfilePage.css";
+import useAuth from "../hooks/useAuth"; // koristimo naš hook umjesto mock korisnika
 
-// Simulacija auth konteksta - zamijeniti s pravim AuthContext od Hane
-const mockUser = {
-  id: 1,
-  name: "Adna Sarvan",
-  email: "adna@example.com",
-  avatar: null,
-  createdAt: "2024-01-15T10:00:00.000Z",
-};
 
 const JSON_SERVER_URL = "http://localhost:3001";
 const SUPABASE_URL = "https://omnniawtnvyyunrdnfbf.supabase.co";
@@ -18,7 +11,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const TABS = ["Moje pjesme", "Playliste", "Omiljeno"];
 
 const ProfilePage = () => {
-  const user = mockUser; // zamijeniti s useContext(AuthContext).user
+  const { user } = useAuth(); // uzimamo pravog prijavljenog korisnika
   const [activeTab, setActiveTab] = useState("Moje pjesme");
   const [songs, setSongs] = useState([]);
   const [playlists, setPlaylists] = useState([]);
@@ -140,7 +133,8 @@ const ProfilePage = () => {
   };
 
   const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString("bs-BA", {
+    if (!dateStr) return 'Nepoznato';
+    return new Date(dateStr).toLocaleDateString("hr-HR", {
       year: "numeric", month: "long", day: "numeric",
     });
   };
