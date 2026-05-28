@@ -23,13 +23,73 @@ Platforma za dijeljenje i istraživanje muzike. Korisnici mogu pregledavati pjes
 | React | 18.x |
 | React Router | 6.x |
 | Tailwind CSS | 3.x |
+| Node.js | 18.x |
 | json-server | 0.17.x |
-| Docker | latest |
+| Docker | 24.x |
+| nginx | alpine |
 | Google Cloud Run | - |
 
 ---
 
-## Pokretanje projekta
+## Arhitekturni dijagram
+
+```
+┌─────────────────────────────────────────────┐
+│              Korisnikov browser              │
+└──────────────────┬──────────────────────────┘
+                   │ HTTPS
+        ┌──────────▼──────────┐
+        │   Cloud Run         │
+        │   Frontend (nginx)  │  :443
+        │   React SPA         │
+        └──────────┬──────────┘
+                   │ HTTP API pozivi
+        ┌──────────▼──────────┐
+        │   Cloud Run         │
+        │   Backend           │  :3001
+        │   (json-server)     │
+        └──────────┬──────────┘
+                   │
+        ┌──────────▼──────────┐
+        │      db.json        │
+        │   (baza podataka)   │
+        └─────────────────────┘
+```
+
+---
+
+## Paleta boja i fontovi
+
+| Naziv | Hex | Upotreba |
+|-------|-----|----------|
+| Dark | `#0d0d14` | Pozadina aplikacije |
+| Surface | `#16161f` | Kartice i paneli |
+| Card | `#1c1c28` | Komponente |
+| Purple | `#a855f7` | Primarna akcent boja |
+| Blue | `#38bdf8` | Sekundarna akcent boja |
+| Pink | `#ec4899` | Tercijarna akcent boja |
+| Text | `#f1f0ff` | Glavni tekst |
+| Muted | `#8888aa` | Sekundarni tekst |
+
+**Font:** Inter (Google Fonts)
+
+**Gradijent:** `linear-gradient(135deg, #38bdf8, #a855f7, #ec4899)`
+
+---
+
+## Korisničke uloge i prava pristupa
+
+| Uloga | Prava |
+|-------|-------|
+| **Gost** (neprijavljen) | Pregled pjesama, pretraga, kontakt stranica |
+| **Korisnik** (prijavljen) | Sve gostujuće + upload pjesama, korisnički profil |
+| **Admin** | Sve korisničke + admin panel (CRUD sve pjesme) |
+
+Autentifikacija je implementirana putem Context API i `useAuth` custom hooka. Admin rute su zaštićene `AdminRoute` komponentom koja provjerava `user.role === 'admin'`.
+
+---
+
+## Pokretanje projekta (lokalno)
 
 ### Preduslovi
 - Node.js 18+
@@ -62,16 +122,26 @@ npm run dev
 
 Frontend je dostupan na: `http://localhost:5173`
 
+### 4. Pokretanje sa Docker Compose
+
+```bash
+docker compose up --build
+```
+
 ---
 
 ## Stranice
 
-| Ruta | Stranica | Opis |
-|------|----------|------|
-| `/` | Browse | Pregled i pretraga svih pjesama |
-| `/upload` | Upload | Dodavanje nove pjesme |
-| `/admin` | Admin Panel | CRUD upravljanje pjesmama |
-| `/contact` | Kontakt | Kontakt forma i Google Maps |
+| Ruta | Stranica | Pristup |
+|------|----------|---------|
+| `/` | Landing Page | Svi |
+| `/browse` | Browse muzike | Svi |
+| `/login` | Prijava | Svi |
+| `/register` | Registracija | Svi |
+| `/upload` | Upload pjesme | Prijavljeni korisnici |
+| `/profile` | Korisnički profil | Prijavljeni korisnici |
+| `/admin` | Admin Panel | Samo admini |
+| `/contact` | Kontakt + Google Maps | Svi |
 
 ---
 
@@ -87,21 +157,90 @@ Frontend je dostupan na: `http://localhost:5173`
 
 ---
 
-## Health Check
+## Docker setup
+
+### Dockerfile – Frontend (multi-stage)
+Build stage koristi Node.js za `npm run build`, serve stage koristi nginx:alpine za posluživanje statičkih fajlova. Nginx je konfiguriran za React Router (`try_files`).
+
+### Dockerfile – Backend
+Koristi node:18-alpine kao base image. `db.json` je uključen u image.
+
+### Pokretanje
 
 ```bash
-bash health-check.sh
-```
+# Lokalno pokretanje sa Docker Compose
+docker compose up --build
 
-Skripta provjerava da li su frontend i backend servisi dostupni.
+# Frontend dostupan na: http://localhost:80
+# Backend dostupan na: http://localhost:3001
+```
 
 ---
 
-## Deployment
+## GCP Setup
 
-Aplikacija je deployovana na **Google Cloud Run**.
+### Korištene usluge
+- **Artifact Registry** — čuvanje Docker imagea
+- **Cloud Run** — serverless deployment kontejnera
+- **IAM** — upravljanje pristupom
 
-- Frontend: Docker container sa nginx serverom
-- Backend: Docker container sa json-serverom
-- Orkestracija: docker-compose.yml
-- CI/CD: GitHub Actions
+### Deployment komande
+
+```bash
+# Autentifikacija
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+
+# Push imagea u Artifact Registry
+docker build -t europe-west1-docker.pkg.dev/PROJECT_ID/shnare/frontend:latest ./frontend
+docker push europe-west1-docker.pkg.dev/PROJECT_ID/shnare/frontend:latest
+
+# Deploy na Cloud Run
+gcloud run deploy shnare-frontend \
+  --image europe-west1-docker.pkg.dev/PROJECT_ID/shnare/frontend:latest \
+  --platform managed \
+  --region europe-west1 \
+  --allow-unauthenticated
+```
+
+### CI/CD
+GitHub Actions workflow (`.github/workflows/deploy.yml`) automatski builda i deploya aplikaciju pri svakom pushu na `main` granu.
+
+---
+
+## Health Check
+
+```bash
+# Pokretanje skripte
+chmod +x scripts/health-check.sh
+bash scripts/health-check.sh
+```
+
+Skripta provjerava dostupnost frontend i backend servisa na produkcijskom URL-u, logira rezultat sa timestampom u `logs/health-check.log` i vraća exit kod 1 ako neki servis nije dostupan.
+
+Primjer izlaza:
+```
+[2026-05-28 22:00:00] ========== Health Check Start ==========
+[2026-05-28 22:00:01] OK - Frontend (Cloud Run) radi ispravno (HTTP 200) - URL: https://...
+[2026-05-28 22:00:02] OK - Backend (Cloud Run) radi ispravno (HTTP 200) - URL: https://...
+[2026-05-28 22:00:02] ========== Health Check End (greške: 0) ==========
+```
+
+---
+
+## Produkcijski URL
+
+> 🔗 Frontend: `https://shnare-frontend-XXXXXXXX-ew.a.run.app` *(ažurirati nakon deploymenta)*
+> 🔗 Backend: `https://shnare-backend-XXXXXXXX-ew.a.run.app` *(ažurirati nakon deploymenta)*
+
+---
+
+## Screenshotovi
+
+> *(Dodati screenshotove nakon deploymenta: landing stranica, prijava, admin panel, mobilni prikaz, GCP Cloud Run konzola)*
+
+---
+
+## Refleksija tima
+
+Tokom izrade projekta naučili smo kako integrirati frontend React aplikaciju sa json-server backendom, kako dockerizirati aplikaciju koristeći multi-stage build, te kako postaviti CI/CD pipeline putem GitHub Actions i Google Cloud Run. Najveći izazov bio je konfiguracija GCP IAM pristupa i Artifact Registry. U budućnosti bismo koristili pravu bazu podataka umjesto json-servera i dodali više sigurnosnih mehanizama.
