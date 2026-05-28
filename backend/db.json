@@ -1,23 +1,114 @@
 {
-  "songs": [],
   "users": [
     {
-      "id": "1",
+      "id": 1,
       "name": "Admin",
       "email": "admin@shnare.com",
       "password": "admin123",
       "role": "admin",
-      "createdAt": "2025-01-01T00:00:00.000Z"
+      "avatar": null,
+      "createdAt": "2024-01-01T00:00:00.000Z"
     },
     {
-      "name": "Hana Jašarević",
-      "email": "hanaj@gmail.com",
-      "password": "hanaj123",
-      "role": "user",
-      "createdAt": "2026-05-22T10:20:02.495Z",
-      "id": "HEODRD1"
+      "id": 2,
+      "name": "Test User",
+      "email": "user@shnare.com",
+      "password": "user123",
+      "role": "guest",
+      "avatar": null,
+      "createdAt": "2024-01-02T00:00:00.000Z"
     }
   ],
-  "playlists": [],
-  "favorites": []
+  "songs": [
+    {
+      "id": 1,
+      "title": "Blinding Lights",
+      "artist": "The Weeknd",
+      "genre": "Pop",
+      "description": "Hit singl s albuma After Hours.",
+      "year": 2019,
+      "audioUrl": "",
+      "coverUrl": "",
+      "plays": 1200,
+      "userId": 1,
+      "createdAt": "2024-01-10T10:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "title": "Lose Yourself",
+      "artist": "Eminem",
+      "genre": "Hip-Hop",
+      "description": "Klasik s filma 8 Mile.",
+      "year": 2002,
+      "audioUrl": "",
+      "coverUrl": "",
+      "plays": 3400,
+      "userId": 1,
+      "createdAt": "2024-01-11T10:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "title": "Bohemian Rhapsody",
+      "artist": "Queen",
+      "genre": "Rock",
+      "description": "Legendarni rok komad.",
+      "year": 1975,
+      "audioUrl": "",
+      "coverUrl": "",
+      "plays": 5000,
+      "userId": 2,
+      "createdAt": "2024-01-12T10:00:00.000Z"
+    }
+  ],
+  "playlists": [
+    {
+      "id": 1,
+      "name": "Jutarnje vibracije",
+      "description": "Pjesme za dobro jutro.",
+      "userId": 2,
+      "songs": [1, 3],
+      "createdAt": "2024-02-01T08:00:00.000Z"
+    }
+  ],
+  "favorites": [
+    {
+      "id": 1,
+      "userId": 2,
+      "songId": 1,
+      "title": "Blinding Lights",
+      "artist": "The Weeknd",
+      "type": "song",
+      "description": "Jedna od mojih omiljenih pjesama.",
+      "createdAt": "2024-02-05T12:00:00.000Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "songId": 1,
+      "userId": 2,
+      "userName": "Test User",
+      "text": "Odlična pjesma!",
+      "createdAt": "2024-02-10T14:00:00.000Z"
+    }
+  ],
+  "ratings": [
+    {
+      "id": 1,
+      "songId": 1,
+      "userId": 2,
+      "value": 5,
+      "createdAt": "2024-02-10T14:05:00.000Z"
+    }
+  ],
+  "genres": [
+    { "id": 1, "name": "Pop" },
+    { "id": 2, "name": "Rock" },
+    { "id": 3, "name": "Hip-Hop" },
+    { "id": 4, "name": "Electronic" },
+    { "id": 5, "name": "R&B" },
+    { "id": 6, "name": "Jazz" },
+    { "id": 7, "name": "Classical" },
+    { "id": 8, "name": "Indie" }
+  ]
 }

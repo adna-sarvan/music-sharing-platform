@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: shnare-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - db-data:/app
+    environment:
+      - PORT=3001
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: shnare-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:3001
+    restart: unless-stopped
+
+volumes:
+  db-data:
