@@ -125,22 +125,27 @@ const UploadPage = () => {
   };
 
   const uploadToSupabase = async (file, bucket, onProgress) => {
+    // Kreiramo jedinstveno ime fajla
     const fileName = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
     const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${bucket}/${fileName}`;
+
+    // KLJUČNI KORAK: Pretvaramo fajl u binarni ArrayBuffer koji Supabase zahtijeva
+    const arrayBuffer = await file.arrayBuffer();
 
     const response = await fetch(uploadUrl, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        "Content-Type": file.type,
+        // Za sirovi binarni upload koristi se octet-stream ili prazno da API sam prepozna
+        "Content-Type": "application/octet-stream", 
         "x-upsert": "true",
       },
-      body: file,
+      body: arrayBuffer, // Šaljemo čiste binarne podatke
     });
 
     if (!response.ok) {
       const err = await response.json();
-      throw new Error(err.message || "Upload failed");
+      throw new Error(err.message || `Upload u bucket "${bucket}" nije uspio.`);
     }
 
     onProgress(100);
