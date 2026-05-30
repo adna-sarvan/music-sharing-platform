@@ -1,21 +1,28 @@
 #!/bin/bash
 
+# ============================================
+# health-check.sh
+# Provjera dostupnosti music-sharing-platform
+# servisa na produkcijskom GCP okruženju
+# ============================================
 
-FRONTEND_URL="https://shnare-frontend-XXXXXXXX-ew.a.run.app"
-BACKEND_URL="https://shnare-backend-XXXXXXXX-ew.a.run.app/songs"
+# Produkcijski URL-ovi
+FRONTEND_URL="https://frontend-service-1024177687549.europe-west3.run.app"
+BACKEND_URL="https://backend-service-1024177687549.europe-west3.run.app/songs"
 
+# Log fajl
 LOG_DIR="$(dirname "$0")/../logs"
 LOG_FILE="$LOG_DIR/health-check.log"
 
-
+# Kreiraj logs folder ako ne postoji
 mkdir -p "$LOG_DIR"
 
-
+# Timestamp funkcija
 timestamp() {
   date "+%Y-%m-%d %H:%M:%S"
 }
 
-
+# Funkcija za provjeru servisa
 check_service() {
   local name=$1
   local url=$2
@@ -37,6 +44,9 @@ check_service() {
   fi
 }
 
+# ============================================
+# Početak health checka
+# ============================================
 echo "[$(timestamp)] ========== Health Check Start ==========" | tee -a "$LOG_FILE"
 
 ERRORS=0
@@ -50,6 +60,7 @@ check_service "Backend (Cloud Run)" "$BACKEND_URL"
 echo "[$(timestamp)] ========== Health Check End (greške: $ERRORS) ==========" | tee -a "$LOG_FILE"
 echo ""
 
+# Exit kod
 if [ $ERRORS -gt 0 ]; then
   exit 1
 else

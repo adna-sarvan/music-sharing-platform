@@ -192,26 +192,22 @@ gcloud auth login
 gcloud config set project YOUR_PROJECT_ID
 
 # Push imagea u Artifact Registry
-docker build -t europe-west1-docker.pkg.dev/PROJECT_ID/shnare/frontend:latest ./frontend
-docker push europe-west1-docker.pkg.dev/PROJECT_ID/shnare/frontend:latest
+docker build -t europe-west3-docker.pkg.dev/PROJECT_ID/shnare/frontend:latest ./frontend
+docker push europe-west3-docker.pkg.dev/PROJECT_ID/shnare/frontend:latest
 
 # Deploy na Cloud Run
-gcloud run deploy shnare-frontend \
-  --image europe-west1-docker.pkg.dev/PROJECT_ID/shnare/frontend:latest \
+gcloud run deploy frontend-service \
+  --image europe-west3-docker.pkg.dev/PROJECT_ID/shnare/frontend:latest \
   --platform managed \
-  --region europe-west1 \
+  --region europe-west3 \
   --allow-unauthenticated
 ```
-
-### CI/CD
-GitHub Actions workflow (`.github/workflows/deploy.yml`) automatski builda i deploya aplikaciju pri svakom pushu na `main` granu.
 
 ---
 
 ## Health Check
 
 ```bash
-# Pokretanje skripte
 chmod +x scripts/health-check.sh
 bash scripts/health-check.sh
 ```
@@ -221,8 +217,8 @@ Skripta provjerava dostupnost frontend i backend servisa na produkcijskom URL-u,
 Primjer izlaza:
 ```
 [2026-05-28 22:00:00] ========== Health Check Start ==========
-[2026-05-28 22:00:01] OK - Frontend (Cloud Run) radi ispravno (HTTP 200) - URL: https://...
-[2026-05-28 22:00:02] OK - Backend (Cloud Run) radi ispravno (HTTP 200) - URL: https://...
+[2026-05-28 22:00:01] OK - Frontend (Cloud Run) radi ispravno (HTTP 200) - URL: https://frontend-service-1024177687549.europe-west3.run.app
+[2026-05-28 22:00:02] OK - Backend (Cloud Run) radi ispravno (HTTP 200) - URL: https://backend-service-1024177687549.europe-west3.run.app/songs
 [2026-05-28 22:00:02] ========== Health Check End (greške: 0) ==========
 ```
 
@@ -230,14 +226,21 @@ Primjer izlaza:
 
 ## Produkcijski URL
 
-> 🔗 Frontend: `https://shnare-frontend-XXXXXXXX-ew.a.run.app` *(ažurirati nakon deploymenta)*
-> 🔗 Backend: `https://shnare-backend-XXXXXXXX-ew.a.run.app` *(ažurirati nakon deploymenta)*
+> 🔗 **Frontend:** https://frontend-service-1024177687549.europe-west3.run.app
+> 🔗 **Backend:** https://backend-service-1024177687549.europe-west3.run.app
 
 ---
 
 ## Screenshotovi
 
-> *(Dodati screenshotove nakon deploymenta: landing stranica, prijava, admin panel, mobilni prikaz, GCP Cloud Run konzola)*
+### Landing stranica
+![Landing](screenshots/landing.png)
+
+### Prijava
+![Prijava](screenshots/prijava.png)
+
+### Admin panel
+![Admin](screenshots/admin.png)
 
 ---
 
