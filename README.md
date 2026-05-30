@@ -11,9 +11,8 @@ Platforma za dijeljenje i istraživanje muzike. Korisnici mogu pregledavati pjes
 | GitHub | DWS doprinos | OSiRuO doprinos |
 |--------|-------------|-----------------|
 | [@hanajasarevic](https://github.com/hana-jasarevic) | Landing page, navigacija, registracija/prijava, Context API, `useAuth` custom hook, protected routes | Dockerfile za frontend (multi-stage, nginx) |
-| [@adnasarvan](https://github.com/adna-sarvan) | Browse/pretraga muzike, upload forma, korisnički profil, 404 stranica, responsivan dizajn, animacije | Dockerfile za backend (json-server), docker-compose.yml, GitHub Actions |
-| [@peratoviclamija](https://github.com/peratoviclamija) | Admin panel (CRUD), kontakt stranica + Google Maps, json-server setup, `useFetch` custom hook | GCP setup, Cloud Run deployment, health-check.sh skripta, README dokumentacija |
-
+| [@adnasarvan](https://github.com/adna-sarvan) | Browse/pretraga muzike, upload forma, korisnički profil, 404 stranica, responsivan dizajn, animacije | Dockerfile za backend (json-server), docker-compose.yml, GitHub Actions, GCP setup, Cloud Run deployment
+| [@peratoviclamija](https://github.com/peratoviclamija) | Admin panel (CRUD), kontakt stranica + Google Maps, json-server setup, `useFetch` custom hook | health-check.sh skripta, README dokumentacija |
 ---
 
 ## Tech Stack
