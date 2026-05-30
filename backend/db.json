@@ -1,7 +1,7 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Admin",
       "email": "admin@shnare.com",
       "password": "admin123",
@@ -10,18 +10,26 @@
       "createdAt": "2024-01-01T00:00:00.000Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Test User",
       "email": "user@shnare.com",
       "password": "user123",
       "role": "guest",
       "avatar": null,
       "createdAt": "2024-01-02T00:00:00.000Z"
+    },
+    {
+      "name": "Adna Sarvan",
+      "email": "adnaishere@gmail.com",
+      "password": "Adna2006",
+      "role": "user",
+      "createdAt": "2026-05-28T21:28:20.883Z",
+      "id": "blOicS9hPUQ"
     }
   ],
   "songs": [
     {
-      "id": 1,
+      "id": "1",
       "title": "Blinding Lights",
       "artist": "The Weeknd",
       "genre": "Pop",
@@ -34,7 +42,7 @@
       "createdAt": "2024-01-10T10:00:00.000Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Lose Yourself",
       "artist": "Eminem",
       "genre": "Hip-Hop",
@@ -47,7 +55,7 @@
       "createdAt": "2024-01-11T10:00:00.000Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "title": "Bohemian Rhapsody",
       "artist": "Queen",
       "genre": "Rock",
@@ -62,17 +70,20 @@
   ],
   "playlists": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Jutarnje vibracije",
       "description": "Pjesme za dobro jutro.",
       "userId": 2,
-      "songs": [1, 3],
+      "songs": [
+        1,
+        3
+      ],
       "createdAt": "2024-02-01T08:00:00.000Z"
     }
   ],
   "favorites": [
     {
-      "id": 1,
+      "id": "1",
       "userId": 2,
       "songId": 1,
       "title": "Blinding Lights",
@@ -84,7 +95,7 @@
   ],
   "comments": [
     {
-      "id": 1,
+      "id": "1",
       "songId": 1,
       "userId": 2,
       "userName": "Test User",
@@ -94,7 +105,7 @@
   ],
   "ratings": [
     {
-      "id": 1,
+      "id": "1",
       "songId": 1,
       "userId": 2,
       "value": 5,
@@ -102,13 +113,38 @@
     }
   ],
   "genres": [
-    { "id": 1, "name": "Pop" },
-    { "id": 2, "name": "Rock" },
-    { "id": 3, "name": "Hip-Hop" },
-    { "id": 4, "name": "Electronic" },
-    { "id": 5, "name": "R&B" },
-    { "id": 6, "name": "Jazz" },
-    { "id": 7, "name": "Classical" },
-    { "id": 8, "name": "Indie" }
-  ]
+    {
+      "id": "1",
+      "name": "Pop"
+    },
+    {
+      "id": "2",
+      "name": "Rock"
+    },
+    {
+      "id": "3",
+      "name": "Hip-Hop"
+    },
+    {
+      "id": "4",
+      "name": "Electronic"
+    },
+    {
+      "id": "5",
+      "name": "R&B"
+    },
+    {
+      "id": "6",
+      "name": "Jazz"
+    },
+    {
+      "id": "7",
+      "name": "Classical"
+    },
+    {
+      "id": "8",
+      "name": "Indie"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
