@@ -11,8 +11,9 @@ Platforma za dijeljenje i istraživanje muzike. Korisnici mogu pregledavati pjes
 | GitHub | DWS doprinos | OSiRuO doprinos |
 |--------|-------------|-----------------|
 | [@hanajasarevic](https://github.com/hana-jasarevic) | Landing page, navigacija, registracija/prijava, Context API, `useAuth` custom hook, protected routes | Dockerfile za frontend (multi-stage, nginx) |
-| [@adnasarvan](https://github.com/adna-sarvan) | Browse/pretraga muzike, upload forma, korisnički profil, 404 stranica, responsivan dizajn, animacije | Dockerfile za backend (json-server), docker-compose.yml, GitHub Actions, GCP setup, Cloud Run deployment
+| [@adnasarvan](https://github.com/adna-sarvan) | Browse/pretraga muzike, upload forma, korisnički profil, 404 stranica, responsivan dizajn, animacije | Dockerfile za backend (json-server), docker-compose.yml, GitHub Actions, GCP setup, Cloud Run deployment |
 | [@peratoviclamija](https://github.com/peratoviclamija) | Admin panel (CRUD), kontakt stranica + Google Maps, json-server setup, `useFetch` custom hook | health-check.sh skripta, README dokumentacija |
+
 ---
 
 ## Tech Stack
@@ -109,7 +110,7 @@ npm install
 npm start
 ```
 
-Backend je dostupan na: `https://backend-service-1024177687549.europe-west3.run.app`
+Backend je dostupan na: `http://localhost:3001`
 
 ### 3. Pokretanje frontenda
 
@@ -171,7 +172,7 @@ Koristi node:18-alpine kao base image. `db.json` je uključen u image.
 docker compose up --build
 
 # Frontend dostupan na: http://localhost:80
-# Backend dostupan na: https://backend-service-1024177687549.europe-west3.run.app
+# Backend dostupan na: http://localhost:3001
 ```
 
 ---

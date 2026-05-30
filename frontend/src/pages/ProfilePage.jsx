@@ -4,7 +4,7 @@ import "./ProfilePage.css";
 import useAuth from "../hooks/useAuth"; // koristimo naš hook umjesto mock korisnika
 
 
-const JSON_SERVER_URL = "https://backend-service-1024177687549.europe-west3.run.app";
+const JSON_SERVER_URL = "http://localhost:3001";
 const SUPABASE_URL = "https://omnniawtnvyyunrdnfbf.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tbm5pYXd0bnZ5eXVucmRuZmJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1NzM0ODAsImV4cCI6MjA5NDE0OTQ4MH0.RWOyxyDts1u8bWtP_d4alD40DLQB_RuKAvdreeZ0zfo";
 

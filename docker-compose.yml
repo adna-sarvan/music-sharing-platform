@@ -20,7 +20,7 @@ services:
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=https://backend-service-1024177687549.europe-west3.run.app
+      - VITE_API_URL=http://localhost:3001
     restart: unless-stopped
 
 volumes:

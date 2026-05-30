@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./AdminPage.css";
 
 const GENRES = ["Pop", "Rock", "Hip-Hop", "Electronic", "R&B", "Jazz", "Classical", "Indie"];
-const API = "https://backend-service-1024177687549.europe-west3.run.app/songs";
+const API = "http://localhost:3001/songs";
 
 const emptyForm = { title: "", artist: "", genre: "Pop", duration: "", cover: "" };
 
