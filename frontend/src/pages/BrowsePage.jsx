@@ -18,7 +18,7 @@ const BrowsePage = () => {
     const fetchSongs = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:3001/songs");
+        const res = await fetch("https://backend-service-1024177687549.europe-west3.run.app/songs");
         if (!res.ok) throw new Error("Greška pri učitavanju.");
         const data = await res.json();
         setSongs(data);

@@ -21,7 +21,7 @@ function LoginPage() {
 
         try {
             // tražimo korisnika u bazi po emailu i lozinki
-            const response = await fetch(`http://localhost:3001/users?email=${email}&password=${password}`);
+            const response = await fetch(`https://backend-service-1024177687549.europe-west3.run.app/users?email=${email}&password=${password}`);
             const users = await response.json();
 
             // ako nema rezultata, kombinacija email/lozinka nije ispravna

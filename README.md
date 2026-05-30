@@ -109,7 +109,7 @@ npm install
 npm start
 ```
 
-Backend je dostupan na: `http://localhost:3001`
+Backend je dostupan na: `https://backend-service-1024177687549.europe-west3.run.app`
 
 ### 3. Pokretanje frontenda
 
@@ -171,7 +171,7 @@ Koristi node:18-alpine kao base image. `db.json` je uključen u image.
 docker compose up --build
 
 # Frontend dostupan na: http://localhost:80
-# Backend dostupan na: http://localhost:3001
+# Backend dostupan na: https://backend-service-1024177687549.europe-west3.run.app
 ```
 
 ---

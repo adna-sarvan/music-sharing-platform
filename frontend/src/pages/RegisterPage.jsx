@@ -19,7 +19,7 @@ function RegisterPage() {
 
         try {
             // prvo provjeravamo da li već postoji korisnik sa tim emailom
-            const checkResponse = await fetch(`http://localhost:3001/users?email=${email}`);
+            const checkResponse = await fetch(`https://backend-service-1024177687549.europe-west3.run.app/users?email=${email}`);
             const existingUsers = await checkResponse.json();
 
             if (existingUsers.length > 0) {
@@ -36,7 +36,7 @@ function RegisterPage() {
                 createdAt: new Date().toISOString()
             };
 
-            const response = await fetch('http://localhost:3001/users', {
+            const response = await fetch('https://backend-service-1024177687549.europe-west3.run.app/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newUser)
