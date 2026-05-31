@@ -1,7 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-// Zamijeni ove stringove sa svojim stvarnim podacima iz Supabase-a
-const supabaseUrl = 'https://omnniawtnvyyunrdnfbf.supabase.co';
-const supabaseAnonKey = 'sb_publishable_PUACYwCFBQDGL0MU2CgkVQ_eH0zYXYs';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
