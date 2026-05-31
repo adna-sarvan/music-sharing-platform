@@ -25,6 +25,7 @@ Platforma za dijeljenje i istraživanje muzike. Korisnici mogu pregledavati pjes
 | Tailwind CSS | 3.x |
 | Node.js | 18.x |
 | json-server | 0.17.x |
+| Supabase | latest |
 | Docker | 24.x |
 | nginx | alpine |
 | Google Cloud Run | - |
@@ -107,7 +108,7 @@ cd music-sharing-platform
 ```bash
 cd backend
 npm install
-npm start
+npx json-server --watch db.json --port 3001
 ```
 
 Backend je dostupan na: `http://localhost:3001`
@@ -241,6 +242,12 @@ Primjer izlaza:
 
 ### Admin panel
 ![Admin](screenshots/admin.png)
+
+### Mobilni prikaz
+![Mobilni](screenshots/mobilna.jpg)
+
+### GCP Cloud Run konzola
+![GCP](screenshots/gcp.jpg)
 
 ---
 
