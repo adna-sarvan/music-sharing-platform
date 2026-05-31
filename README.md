@@ -247,7 +247,7 @@ Primjer izlaza:
 ![Mobilni](screenshots/mobilna_ap.jpg)
 
 ### GCP Cloud Run konzola
-![GCP](screenshots/gcp.jpg)
+![GCP](screenshots/gcp.png)
 
 ---
 
