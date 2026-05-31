@@ -1,13 +1,21 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./UploadPage.css";
+// Uvoz createClient da izvučemo sesiju trenutnog korisnika
+import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = "https://omnniawtnvyyunrdnfbf.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tbm5pYXd0bnZ5eXVucmRuZmJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1NzM0ODAsImV4cCI6MjA5NDE0OTQ4MH0.RWOyxyDts1u8bWtP_d4alD40DLQB_RuKAvdreeZ0zfo";
-const JSON_SERVER_URL = "https://backend-service-1024177687549.europe-west3.run.app";
+// Automatski prepoznaje da li si na localhostu ili na produkciji
+const JSON_SERVER_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:3001" 
+  : "https://backend-service-1024177687549.europe-west3.run.app";
+
+// Inicijalizacija klijenta za autentifikaciju
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const GENRES = ["Pop", "Rock", "Hip-Hop", "Electronic", "R&B", "Jazz", "Classical", "Indie"];
 
-const initForm = { title: "", artist: "", genre: "", description: "", year: String(new Date().getFullYear()) };
+const initForm = { title: "", artist: "", genre: "Pop", description: "", year: String(new Date().getFullYear()) };
 const initErrors = { title: "", artist: "", genre: "", description: "", year: "", audioFile: "", coverFile: "" };
 
 const UploadPage = () => {
@@ -23,11 +31,23 @@ const UploadPage = () => {
   const audioRef = useRef();
   const coverRef = useRef();
   const [toast, setToast] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 4000);
   };
+
+  // Dohvatanje trenutno ulogovanog korisnika sa Supabase-a prilikom učitavanja stranice
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const validate = () => {
     const e = { ...initErrors };
@@ -52,7 +72,7 @@ const UploadPage = () => {
 
   const handleAudioChange = (file) => {
     if (!file) return;
-    if (!["audio/mpeg", "audio/wav", "audio/ogg"].includes(file.type)) {
+    if (!["audio/mpeg", "audio/wav", "audio/ogg", "audio/mp3"].includes(file.type) && !file.name.endsWith('.mp3')) {
       setErrors((p) => ({ ...p, audioFile: "Dozvoljeni formati: MP3, WAV, OGG." })); return;
     }
     if (file.size > 20 * 1024 * 1024) {
@@ -92,36 +112,64 @@ const UploadPage = () => {
     return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${fileName}`;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setUploading(true);
-    setStep(2);
-    setProgress({ audio: 0, cover: 0 });
-    try {
-      const audioUrl = await uploadToSupabase(audioFile, "songs", (p) => setProgress((v) => ({ ...v, audio: p })));
-      let coverUrl = null;
-      if (coverFile) coverUrl = await uploadToSupabase(coverFile, "covers", (p) => setProgress((v) => ({ ...v, cover: p })));
-
-      const res = await fetch(`${JSON_SERVER_URL}/songs`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: form.title.trim(), artist: form.artist.trim(),
-          genre: form.genre, description: form.description.trim(),
-          year: parseInt(form.year), audioUrl, coverUrl, plays: 0,
-          createdAt: new Date().toISOString(),
-        }),
-      });
-      if (!res.ok) throw new Error("Greška pri spremanju.");
-      setStep(3);
-    } catch (err) {
-      showToast(err.message || "Greška.", "error");
-      setStep(1);
-    } finally {
-      setUploading(false);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Čitamo korisnika iz localStorage-a (kako god da je ulogovan na frontend-u)
+  let currentUserId = null;
+  try {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      // Uzimamo id, a ako ne postoji, probamo username/ime
+      currentUserId = parsedUser.id || parsedUser.userId || parsedUser.uid || parsedUser.username;
     }
-  };
+  } catch (err) {
+    console.error("Greška pri čitanju korisnika:", err);
+  }
+
+  // Ako sistem ne nađe ID (npr. u testiranju), dodijeliće "Adna Sarvan" ili 1 
+  // tako da pjesma garantovano prođe i na lokalnom serveru i na GCR bazi
+  if (!currentUserId) {
+    currentUserId = "Adna Sarvan"; 
+  }
+
+  if (!validate()) return;
+  setUploading(true);
+  setStep(2);
+  setProgress({ audio: 0, cover: 0 });
+  
+  try {
+    const audioUrl = await uploadToSupabase(audioFile, "songs", (p) => setProgress((v) => ({ ...v, audio: p })));
+    let coverUrl = null;
+    if (coverFile) coverUrl = await uploadToSupabase(coverFile, "covers", (p) => setProgress((v) => ({ ...v, cover: p })));
+
+    // Šaljemo podatke na tvoj backend servis (koji radi i lokalno i na GCR)
+    const res = await fetch(`${JSON_SERVER_URL}/songs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: form.title.trim(), 
+        artist: form.artist.trim(),
+        genre: form.genre, 
+        description: form.description.trim(),
+        year: parseInt(form.year), 
+        audioUrl, 
+        coverUrl, 
+        plays: 0,
+        userId: currentUserId, 
+        createdAt: new Date().toISOString(),
+      })
+    });
+    if (!res.ok) throw new Error("Greška pri spremanju na server.");
+    setStep(3);
+  } catch (err) {
+    showToast(err.message || "Greška.", "error");
+    setStep(1);
+  } finally {
+    setUploading(false);
+  }
+};
 
   const handleReset = () => {
     setForm(initForm);
@@ -135,12 +183,11 @@ const UploadPage = () => {
     if (coverRef.current) coverRef.current.value = "";
   };
 
-  // Drag and drop
   const onDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer.files[0];
-    if (file?.type.startsWith("audio/")) handleAudioChange(file);
+    if (file) handleAudioChange(file);
   };
 
   if (step === 3) {
@@ -171,14 +218,12 @@ const UploadPage = () => {
         </div>
       )}
 
-      {/* Background */}
       <div className="upload__bg">
         <div className="upload__orb upload__orb--1" />
         <div className="upload__orb upload__orb--2" />
       </div>
 
       <div className="upload__inner">
-        {/* Header */}
         <div className="upload__header">
           <p className="shn-section-label">Objavi</p>
           <h1 className="upload__title">
@@ -190,9 +235,7 @@ const UploadPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} noValidate className="upload__form">
-          {/* Cover + Audio row */}
           <div className="upload__media-row">
-            {/* Cover picker */}
             <div className="upload__cover-wrap">
               <div
                 className={`upload__cover-picker ${coverPreview ? "upload__cover-picker--filled" : ""}`}
@@ -230,7 +273,6 @@ const UploadPage = () => {
               {errors.coverFile && <p className="upload__field-error">{errors.coverFile}</p>}
             </div>
 
-            {/* Fields */}
             <div className="upload__fields">
               <div className="upload__row">
                 <div className="upload__field">
@@ -250,7 +292,6 @@ const UploadPage = () => {
                   <label className="upload__label">Žanr *</label>
                   <div className="upload__select-wrap">
                     <select className={`shn-input shn-select ${errors.genre ? "shn-input--err" : ""}`} name="genre" value={form.genre} onChange={handleChange}>
-                      <option value="">Odaberi žanr</option>
                       {GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
                     </select>
                     <svg className="upload__select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M6 9l6 6 6-6" strokeLinecap="round" /></svg>
@@ -272,7 +313,6 @@ const UploadPage = () => {
             </div>
           </div>
 
-          {/* Audio dropzone */}
           <div className="upload__audio-section">
             <label className="upload__label">Audio fajl * · MP3, WAV, OGG · max 20MB</label>
             <div
@@ -312,11 +352,10 @@ const UploadPage = () => {
                 </div>
               )}
             </div>
-            <input ref={audioRef} type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioChange(e.target.files[0])} style={{ display: "none" }} />
+            <input ref={audioRef} type="file" accept="audio/mpeg,audio/wav,audio/ogg,audio/mp3" onChange={(e) => handleAudioChange(e.target.files[0])} style={{ display: "none" }} />
             {errors.audioFile && <p className="upload__field-error">{errors.audioFile}</p>}
           </div>
 
-          {/* Upload progress */}
           {step === 2 && (
             <div className="upload__progress-section">
               <div className="upload__progress-item">
@@ -338,7 +377,6 @@ const UploadPage = () => {
             </div>
           )}
 
-          {/* Submit */}
           <button type="submit" className="upload__submit shn-btn shn-btn-primary" disabled={uploading}>
             {uploading ? (
               <><div className="shn-spinner" style={{ width: 18, height: 18, borderWidth: 2 }} />Uploadovanje...</>

@@ -4,6 +4,11 @@ import "./BrowsePage.css";
 
 const GENRES = ["Sve", "Pop", "Rock", "Hip-Hop", "Electronic", "R&B", "Jazz", "Classical", "Indie"];
 
+// 1. Definišemo univerzalni URL (isto kao na UploadPage - automatski prebacuje localhost i GCR)
+const JSON_SERVER_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:3001" 
+  : "https://backend-service-1024177687549.europe-west3.run.app";
+
 const BrowsePage = () => {
   const [songs, setSongs] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -18,9 +23,13 @@ const BrowsePage = () => {
     const fetchSongs = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:3001/songs");
-        if (!res.ok) throw new Error("Greška pri učitavanju.");
+        
+        // 2. Vučemo podatke sa tvog backenda (JSON Server / Cloud Run) umjesto iz Supabase tabela
+        const res = await fetch(`${JSON_SERVER_URL}/songs`);
+        if (!res.ok) throw new Error("Neuspješno učitavanje pjesama sa servera.");
+        
         const data = await res.json();
+
         setSongs(data);
         setFiltered(data);
       } catch (err) {
@@ -29,6 +38,7 @@ const BrowsePage = () => {
         setLoading(false);
       }
     };
+
     fetchSongs();
   }, []);
 
@@ -65,12 +75,10 @@ const BrowsePage = () => {
     <div className="browse">
       {/* Hero / search header */}
       <header className="browse__hero" ref={heroRef}>
-        {/* Ambient orbs */}
         <div className="browse__orb browse__orb--1" />
         <div className="browse__orb browse__orb--2" />
         <div className="browse__orb browse__orb--3" />
 
-        {/* Mouse spotlight */}
         <div
           className="browse__spotlight"
           style={{ left: spotlight.x, top: spotlight.y }}
@@ -79,8 +87,7 @@ const BrowsePage = () => {
         <div className="browse__hero-content">
           <p className="browse__label shn-section-label shn-anim-1">Istraži muziku</p>
           <h1 className="browse__title shn-anim-2">
-            Pronađi zvuk koji{" "}
-            <span className="shn-grad-text">osjećaš</span>
+            Pronađi zvuk koji <span className="shn-grad-text">osjećaš</span>
           </h1>
           <p className="browse__subtitle shn-anim-3">
             {songs.length} pjesama · {GENRES.length - 1} žanrova
