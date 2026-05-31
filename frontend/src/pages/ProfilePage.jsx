@@ -7,205 +7,115 @@ import API from "../config";
 
 const TABS = [
   { id: "songs",     label: "Moje pjesme",   icon: "🎵" },
-  { id: "playlists", label: "Playliste",    icon: "📋" },
-  { id: "favorites", label: "Omiljeno",     icon: "❤️" },
+  { id: "playlists", label: "Playliste",     icon: "📋" },
+  { id: "favorites", label: "Omiljeno",      icon: "❤️" },
 ];
-
-// 1. Definišemo univerzalni URL (isti onaj koji automatski prebacuje localhost i GCR)
-const JSON_SERVER_URL = window.location.hostname === "localhost" 
-  ? "http://localhost:3001" 
-  : "https://backend-service-1024177687549.europe-west3.run.app";
 
 const ProfilePage = () => {
   const { user } = useAuth();
-  const [tab,       setTab]       = useState("songs");
-  const [songs,     setSongs]     = useState([]);
+  const [tab, setTab] = useState("songs");
+  const [songs, setSongs] = useState([]);
   const [playlists, setPlaylists] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  const [loading,   setLoading]   = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [editMode,    setEditMode]    = useState(false);
-  const [editName,    setEditName]    = useState(user?.name || "");
-  const [editAvatar,  setEditAvatar]  = useState(null);
-  const [avatarPrev,  setAvatarPrev]  = useState(user?.avatar || null);
-  const [saving,      setSaving]      = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editName, setEditName] = useState(user?.name || "");
+  const [avatarPrev, setAvatarPrev] = useState(user?.avatar || null);
+  const [saving, setSaving] = useState(false);
 
-  const [showModal,      setShowModal]      = useState(false);
-  const [newPlaylist,    setNewPlaylist]    = useState({ name: "", desc: "" });
-  const [creatingPl,     setCreatingPl]     = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [newPlaylist, setNewPlaylist] = useState({ name: "", desc: "" });
+  const [creatingPl, setCreatingPl] = useState(false);
 
-  const [toast,  setToast]  = useState(null);
-  const avatarRef = useRef();
+  const [toast, setToast] = useState(null);
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3500);
   };
 
-  // Upisujemo editName čim se user učita iz auth hook-a
   useEffect(() => {
-    if (user?.name) setEditName(user.name);
-    if (user?.avatar) setAvatarPrev(user.avatar);
+    if (user) {
+      fetchData();
+    }
   }, [user]);
 
-  // 2. Pametno učitavanje podataka sa tvog backenda (JSON Server / Cloud Run)
-  useEffect(() => {
-    // Ako nemamo user ID ili ime, probamo izvući "Adna Sarvan" kao fallback za testiranje
-    const currentUserId = user?.id || user?.username || user?.name || "Adna Sarvan";
-    
-    const fetchAll = async () => {
-      setLoading(true);
-      try {
-        // Vučemo sve resurse sa našeg backenda paralelno
-        const [songsRes, playlistsRes, favoritesRes] = await Promise.all([
-          fetch(`${JSON_SERVER_URL}/songs`),
-          fetch(`${JSON_SERVER_URL}/playlists`),
-          fetch(`${JSON_SERVER_URL}/favorites`)
-        ]);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Pretpostavka: Tabele se zovu 'songs', 'playlists', 'favorites'
+      // Prilagodi imena tabela ako se u Supabase drugačije zovu
+      const [songsData, playlistsData, favoritesData] = await Promise.all([
+        supabase.from("songs").select("*").eq("user_id", user.id),
+        supabase.from("playlists").select("*").eq("user_id", user.id),
+        supabase.from("favorites").select("*").eq("user_id", user.id)
+      ]);
 
-        if (!songsRes.ok || !playlistsRes.ok || !favoritesRes.ok) {
-          throw new Error("Greška u odgovoru servera.");
-        }
+      if (songsData.error) throw songsData.error;
+      if (playlistsData.error) throw playlistsData.error;
+      if (favoritesData.error) throw favoritesData.error;
 
-        const allSongs = await songsRes.json();
-        const allPlaylists = await playlistsRes.json();
-        const allFavorites = await favoritesRes.json();
-
-        // Filtriramo podatke tako da provjeravamo poklapanje po bilo kojem parametru korisnika 
-        // (ID-u, imenu ili fallback stringu) kako ništa ne bi ostalo skriveno
-        const mySongs = allSongs.filter(s => 
-          s.userId === currentUserId || 
-          s.userId === user?.id || 
-          s.userId === "Adna Sarvan"
-        );
-
-        const myPlaylists = allPlaylists.filter(p => 
-          p.userId === currentUserId || 
-          p.userId === user?.id || 
-          p.userId === "Adna Sarvan"
-        );
-
-        const myFavorites = allFavorites.filter(f => 
-          f.userId === currentUserId || 
-          f.userId === user?.id || 
-          f.userId === "Adna Sarvan"
-        );
-
-        setSongs(mySongs);
-        setPlaylists(myPlaylists);
-        setFavorites(myFavorites);
-      } catch (err) {
-        console.error(err);
-        showToast("Greška pri učitavanju podataka sa servera.", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchAll();
-  }, [user?.id, user?.name]);
-
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setEditAvatar(file);
-    setAvatarPrev(URL.createObjectURL(file));
+      setSongs(songsData.data || []);
+      setPlaylists(playlistsData.data || []);
+      setFavorites(favoritesData.data || []);
+    } catch (err) {
+      console.error("Greška pri učitavanju:", err);
+      showToast("Greška pri učitavanju podataka.", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // 3. Spašavanje profila na backend servis
   const handleSaveProfile = async () => {
-    if (!editName.trim()) return;
     setSaving(true);
-    const currentUserId = user?.id || "Adna Sarvan";
     try {
-      let avatarUrl = avatarPrev;
-
-      if (editAvatar) {
-        const fileName = `avatars/${currentUserId}-${Date.now()}.${editAvatar.name.split(".").pop()}`;
-        
-        const { data: storageData, error: storageError } = await supabase.storage
-          .from("covers")
-          .upload(fileName, editAvatar, {
-            contentType: "application/octet-stream",
-            upsert: true,
-          });
-
-        if (storageError) throw storageError;
-
-        const { data: urlData } = supabase.storage.from("covers").getPublicUrl(fileName);
-        avatarUrl = urlData.publicUrl;
-      }
-
-      // Ažuriranje korisnika radimo preko našeg backenda
-      const res = await fetch(`${JSON_SERVER_URL}/users/${currentUserId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: editName.trim(), avatar: avatarUrl })
-      });
-
-      // Ako PATCH na specifičan ID ne prođe (npr. u db.json nema tog ID-a), uradićemo opšti update
-      if (!res.ok) {
-        console.log("Korisnik nije pronađen po ID-u, ažuriranje lokalnog stanja...");
-      }
-
-      showToast("Profil ažuriran! ✨");
+      // Ovdje ažuriraj profil u Supabase 'profiles' tabeli
+      const { error } = await supabase
+        .from('profiles')
+        .update({ name: editName })
+        .eq('id', user.id);
+      
+      if (error) throw error;
+      showToast("Profil ažuriran!");
       setEditMode(false);
     } catch (err) {
-      console.error(err);
-      showToast("Greška pri ažuriranju.", "error");
+      showToast("Greška pri spremanju.", "error");
     } finally {
       setSaving(false);
     }
   };
 
-  // 4. Kreiranje nove playliste na backendu
   const handleCreatePlaylist = async () => {
-    if (!newPlaylist.name.trim()) return;
     setCreatingPl(true);
-    const currentUserId = user?.id || "Adna Sarvan";
     try {
-      const playlistObject = {
-        name: newPlaylist.name.trim(),
-        description: newPlaylist.desc.trim(),
-        userId: currentUserId,
-        songs: [],
-        createdAt: new Date().toISOString(),
-      };
+      const { data, error } = await supabase
+        .from('playlists')
+        .insert([{ 
+          name: newPlaylist.name, 
+          description: newPlaylist.desc, 
+          user_id: user.id 
+        }])
+        .select();
 
-      const res = await fetch(`${JSON_SERVER_URL}/playlists`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(playlistObject)
-      });
-
-      if (!res.ok) throw new Error("Server je odbio kreiranje playliste.");
-      const data = await res.json();
-
-      setPlaylists((p) => [...p, data]);
-      setNewPlaylist({ name: "", desc: "" });
+      if (error) throw error;
+      setPlaylists([...playlists, ...data]);
       setShowModal(false);
-      showToast("Playlist kreirana! 🎵");
+      showToast("Playlista kreirana!");
     } catch (err) {
-      console.error(err);
       showToast("Greška pri kreiranju.", "error");
     } finally {
       setCreatingPl(false);
     }
   };
 
-  // 5. Brisanje playliste sa backenda
   const handleDeletePlaylist = async (id) => {
     try {
-      const res = await fetch(`${JSON_SERVER_URL}/playlists/${id}`, {
-        method: "DELETE"
-      });
-
-      if (!res.ok) throw new Error("Neuspješno brisanje sa servera.");
-
-      setPlaylists((p) => p.filter((pl) => pl.id !== id));
-      showToast("Playlist obrisana.");
+      const { error } = await supabase.from('playlists').delete().eq('id', id);
+      if (error) throw error;
+      setPlaylists(playlists.filter(p => p.id !== id));
+      showToast("Obrisano!");
     } catch (err) {
-      console.error(err);
       showToast("Greška pri brisanju.", "error");
     }
   };
