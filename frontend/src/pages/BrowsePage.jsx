@@ -1,13 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import SongCard from "../components/SongCard";
 import "./BrowsePage.css";
+import { supabase } from "../supabaseClient";
 
 const GENRES = ["Sve", "Pop", "Rock", "Hip-Hop", "Electronic", "R&B", "Jazz", "Classical", "Indie"];
-
-// 1. Definišemo univerzalni URL (isto kao na UploadPage - automatski prebacuje localhost i GCR)
-const JSON_SERVER_URL = window.location.hostname === "localhost" 
-  ? "http://localhost:3001" 
-  : "https://backend-service-1024177687549.europe-west3.run.app";
 
 const BrowsePage = () => {
   const [songs, setSongs] = useState([]);
@@ -23,17 +19,20 @@ const BrowsePage = () => {
     const fetchSongs = async () => {
       try {
         setLoading(true);
-        
-        // 2. Vučemo podatke sa tvog backenda (JSON Server / Cloud Run) umjesto iz Supabase tabela
-        const res = await fetch(`${JSON_SERVER_URL}/songs`);
-        if (!res.ok) throw new Error("Neuspješno učitavanje pjesama sa servera.");
-        
-        const data = await res.json();
 
-        setSongs(data);
-        setFiltered(data);
+        // 2. Dohvat pjesama direktno iz Supabase-a umjesto JSON-server backenda
+        const { data, error } = await supabase
+          .from("songs")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        const songsData = data || [];
+        setSongs(songsData);
+        setFiltered(songsData);
       } catch (err) {
-        setError(err.message);
+        setError(err.message || "Neuspješno učitavanje pjesama sa Supabase-a.");
       } finally {
         setLoading(false);
       }
