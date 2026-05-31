@@ -4,37 +4,30 @@ import useAuth from '../hooks/useAuth';
 import './LoginPage.css';
 
 function LoginPage() {
-    // stanja za polja forme
+    // Stanja za polja forme
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(''); // poruka greške ako login ne uspije
+    const [error, setError] = useState(''); // Za prikaz grešaka na ekranu
 
-    // uzimamo login funkciju iz AuthContext-a
+    // Uzimamo zajedničku login funkciju iz našeg AuthContext-a
     const { login } = useAuth();
-
-    // za preusmjeravanje na drugu stranicu nakon prijave
     const navigate = useNavigate();
 
-    const handleLogin = async (e) => {
-        e.preventDefault(); // da se stranica ne reloada pri submitu forme
-        setError('');
+    // Ova funkcija se pokreće kada korisnik klikne na dugme "Prijavi se"
+    const handleSubmit = async (e) => {
+        // 1. Sprječavamo browser da osvježi stranicu i doda "?" u URL
+        e.preventDefault(); 
+        setError(''); // Čistimo prethodne greške ako ih je bilo
 
-        try {
-            // tražimo korisnika u bazi po emailu i lozinki
-            const response = await fetch(`http://localhost:3001/users?email=${email}&password=${password}`);
-            const users = await response.json();
+        // 2. Pozivamo login funkciju iz AuthContext-a i šaljemo joj email i lozinku
+        const result = await login(email, password);
 
-            // ako nema rezultata, kombinacija email/lozinka nije ispravna
-            if (users.length === 0) {
-                setError('Pogrešan email ili lozinka.');
-                return;
-            }
-
-            // spremamo korisnika u context i idemo na početnu
-            login(users[0]);
-            navigate('/');
-        } catch (err) {
-            setError('Greška pri povezivanju sa serverom.');
+        if (result.success) {
+            // Ako je prijava uspješna, idemo na stranicu za pregled pjesama
+            navigate('/browse');
+        } else {
+            // Ako login vrati grešku (npr. pogrešna šifra), ispisujemo je na ekranu
+            setError(result.error || 'Pogrešni podaci za prijavu.');
         }
     };
 
@@ -44,10 +37,11 @@ function LoginPage() {
                 <h2>Prijava</h2>
                 <p className="auth-subtitle">Dobrodošli nazad!</p>
 
-                {/* prikazujemo grešku samo ako postoji */}
-                {error && <div className="auth-error">{error}</div>}
+                {/* Prikazujemo crveni boks sa greškom samo ako error stanje nije prazno */}
+                {error && <div className="auth-error" style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
 
-                <form onSubmit={handleLogin}>
+                {/* Spajamo našu formu sa handleSubmit funkcijom */}
+                <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>Email</label>
                         <input
@@ -73,7 +67,6 @@ function LoginPage() {
                     <button type="submit" className="auth-btn">Prijavi se</button>
                 </form>
 
-                {/* link za registraciju ako korisnik nema račun */}
                 <p className="auth-switch">
                     Nemaš račun? <Link to="/register">Registruj se</Link>
                 </p>

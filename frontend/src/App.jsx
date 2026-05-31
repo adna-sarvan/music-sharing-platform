@@ -17,24 +17,37 @@ import NotFound from './pages/NotFound';
 // importujemo Navbar komponentu
 import Navbar from './components/Navbar';
 
-// ProtectedRoute - ako korisnik nije prijavljen, šaljemo ga na login
+// ProtectedRoute - čuva stranice za prijavljene korisnike
 function ProtectedRoute({ children }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  // Ako aplikacija još provjerava localStorage, čekamo!
+  if (loading) {
+    return <div style={{ color: 'white', textAlignment: 'center', marginTop: '50px' }}>Učitavanje...</div>;
+  }
+
+  // Tek kad završi loading, ako stvarno nema korisnika, šalji na login
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
+
   return children;
 }
 
-// AdminRoute - dostupno samo korisnicima sa role: "admin"
+// AdminRoute - čuva stranice samo za admine
 function AdminRoute({ children }) {
-  const { user } = useAuth();
-  if (!user || user.role !== 'admin') {
-    return <Navigate to="/" />;
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ color: 'white', textAlignment: 'center', marginTop: '50px' }}>Učitavanje...</div>;
   }
+
+  if (!user || user.role !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 }
-
 function App() {
   return (
     // AuthProvider obmotava cijelu aplikaciju da sve stranice imaju pristup contextu

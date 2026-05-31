@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import { supabase } from '../supabaseClient';
 import './LoginPage.css'; // koristimo isti css kao za login, nema potrebe pisati novi
 
 function RegisterPage() {
@@ -14,43 +15,46 @@ function RegisterPage() {
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
-        e.preventDefault(); // spriječavamo reload stranice
-        setError('');
+    e.preventDefault();
+    setError(''); // Čistimo stare greške
 
-        try {
-            // prvo provjeravamo da li već postoji korisnik sa tim emailom
-            const checkResponse = await fetch(`http://localhost:3001/users?email=${email}`);
-            const existingUsers = await checkResponse.json();
+    try {
+        // 1. Prvo provjeravamo da li korisnik sa tim emailom već postoji u Supabase-u
+        const { data: existingUser } = await supabase
+            .from('users')
+            .select('email')
+            .eq('email', email)
+            .maybeSingle(); // maybeSingle neće baciti grešku 406 ako nema nikoga
 
-            if (existingUsers.length > 0) {
-                setError('Korisnik sa tim emailom već postoji.');
-                return;
-            }
-
-            // kreiramo novog korisnika - šaljemo POST na json-server
-            const newUser = {
-                name,
-                email,
-                password,
-                role: 'user', // svaki novi korisnik dobija ulogu "user", ne admin
-                createdAt: new Date().toISOString()
-            };
-
-            const response = await fetch('http://localhost:3001/users', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newUser)
-            });
-
-            const createdUser = await response.json();
-
-            // automatski prijavljujemo korisnika nakon registracije
-            login(createdUser);
-            navigate('/');
-        } catch (err) {
-            setError('Greška pri registraciji. Pokušaj ponovo.');
+        if (existingUser) {
+            setError('Korisnik sa ovim emailom već postoji!');
+            return;
         }
-    };
+
+        // 2. Ako ne postoji, upisujemo novog korisnika u tabelu 'users'
+        const { error: insertError } = await supabase
+            .from('users')
+            .insert([
+                { 
+                    id: crypto.randomUUID(),
+                    name: name,
+                    email: email, 
+                    password: password, 
+                    role: 'user' // podrazumijevana uloga
+                }
+            ]);
+
+        if (insertError) throw insertError;
+
+        // 3. Ako je registracija uspješna, preusmjeri ga odmah na login stranicu
+        alert('Registracija uspješna! Sada se možete prijaviti.');
+        navigate('/login');
+
+    } catch (err) {
+        console.error('Greška pri registraciji:', err.message);
+        setError('Greška pri registraciji. Pokušaj ponovo.');
+    }
+};
 
     return (
         <div className="auth-container">

@@ -1,126 +1,130 @@
-/* glavni wrapper za cijelu stranicu */
-.landing-container {
-    min-height: 100vh;
-    background-color: var(--shnare-dark);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 60px 20px;
-}
+.landing { background: var(--shn-void); }
 
-/* hero dio - naslov i buttoni */
-.landing-hero {
-    text-align: center;
-    max-width: 700px;
-    margin-bottom: 80px;
+/* HERO */
+.landing__hero {
+  position: relative; min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 120px 24px 80px; overflow: hidden; isolation: isolate;
 }
-
-.landing-title {
-    font-size: 52px;
-    font-weight: 700;
-    color: var(--shnare-text);
-    line-height: 1.2;
-    margin-bottom: 20px;
+.landing__orb { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
+.landing__orb--1 { top: -100px; left: 5%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(155,93,229,0.18) 0%, transparent 65%); }
+.landing__orb--2 { top: 20%; right: 0; width: 350px; height: 350px; background: radial-gradient(circle, rgba(76,201,240,0.12) 0%, transparent 65%); }
+.landing__orb--3 { bottom: 0; left: 35%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(247,37,133,0.1) 0%, transparent 65%); }
+.landing__spotlight {
+  position: absolute; width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(155,93,229,0.06) 0%, transparent 60%);
+  transform: translate(-50%,-50%); pointer-events: none; z-index: 0;
+  transition: left 0.1s, top 0.1s;
 }
-
-/* šareni span u naslovu - isti efekat kao "nas" na contact stranici */
-.landing-title span {
-    background: var(--shnare-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.landing__bg-wave {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 120px; display: flex; align-items: flex-end; gap: 6px;
+  padding: 0 24px; opacity: 0.06; pointer-events: none;
 }
-
-.landing-subtitle {
-    font-size: 18px;
-    color: var(--shnare-muted);
-    line-height: 1.6;
-    margin-bottom: 40px;
+.landing__bg-bar {
+  flex: 1; border-radius: 4px 4px 0 0;
+  background: var(--shn-grad);
+  animation: shn-wave 1.4s ease-in-out infinite;
 }
-
-/* wrapper za dva buttona */
-.landing-buttons {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
+.landing__hero-inner { position: relative; z-index: 1; text-align: center; max-width: 760px; }
+.landing__badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 18px; border-radius: 99px; margin-bottom: 28px;
+  background: rgba(155,93,229,0.1); border: 1px solid rgba(155,93,229,0.22);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #c4a0ff;
 }
-
-/* glavni button - isti gradijent kao contact btn */
-.btn-primary {
-    padding: 14px 32px;
-    background: linear-gradient(135deg, #38bdf8, #a855f7);
-    color: white;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 16px;
-    transition: opacity 0.2s, transform 0.2s;
+.landing__badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--shn-purple); animation: shn-pulse 2s infinite; }
+.landing__headline {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 800; letter-spacing: -0.04em; line-height: 1.05;
+  color: var(--shn-text); margin-bottom: 22px;
 }
-
-.btn-primary:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+.landing__sub { font-size: 18px; color: var(--shn-muted); max-width: 500px; margin: 0 auto 44px; line-height: 1.7; }
+.landing__btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 64px; }
+.landing__btn-lg { padding: 14px 32px; font-size: 15px; border-radius: 99px; }
+.landing__stats { display: flex; gap: 48px; justify-content: center; flex-wrap: wrap; }
+.landing__stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.landing__stat-num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1; }
+.landing__stat-label { font-size: 11px; color: var(--shn-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.landing__scroll-hint {
+  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--shn-muted); opacity: 0.5;
+  animation: shn-float 2.5s ease-in-out infinite;
 }
+.landing__scroll-line { width: 1px; height: 32px; background: linear-gradient(to bottom, transparent, var(--shn-purple)); }
 
-/* sekundarni button - border verzija */
-.btn-secondary {
-    padding: 14px 32px;
-    background-color: transparent;
-    color: var(--shnare-text);
-    border: 2px solid var(--shnare-purple);
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.2s;
+/* FEATURES */
+.landing__features { padding: 100px 24px; background: var(--shn-surface); }
+.landing__features-inner { max-width: 1120px; margin: 0 auto; }
+.landing__section-head { text-align: center; margin-bottom: 64px; }
+.landing__section-title {
+  font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 800; letter-spacing: -0.03em; color: var(--shn-text); margin: 12px 0 16px;
 }
-
-.btn-secondary:hover {
-    background-color: var(--shnare-purple);
-    transform: translateY(-1px);
+.landing__section-sub { font-size: 16px; color: var(--shn-muted); max-width: 480px; margin: 0 auto; line-height: 1.7; }
+.landing__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.landing__card {
+  position: relative; overflow: hidden;
+  background: var(--shn-card); border: 1px solid var(--shn-border);
+  border-radius: 22px; padding: 32px 28px;
+  transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1), border-color 0.25s, box-shadow 0.3s;
+  animation: shn-fade-up 0.6s both;
+  cursor: default;
 }
-
-/* sekcija sa 3 kartice */
-.landing-features {
-    display: flex;
-    gap: 24px;
-    justify-content: center;
-    flex-wrap: wrap;
-    max-width: 1000px;
+.landing__card:hover {
+  transform: translateY(-7px);
+  border-color: rgba(155,93,229,0.4);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 8px 24px rgba(155,93,229,0.15);
 }
-
-/* pojedinačna kartica - ista sjena kao song-card na hoveru */
-.feature-card {
-    background: var(--shnare-card);
-    border: 1px solid var(--shnare-border);
-    border-radius: 16px;
-    padding: 32px 24px;
-    width: 280px;
-    text-align: center;
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+.landing__card-shine {
+  position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+  transition: left 0.5s;
 }
-
-.feature-card:hover {
-    transform: translateY(-6px);
-    border-color: rgba(168, 85, 247, 0.4);
-    box-shadow: 0 12px 40px rgba(168, 85, 247, 0.15);
+.landing__card:hover .landing__card-shine { left: 150%; }
+.landing__card-icon {
+  width: 56px; height: 56px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(155,93,229,0.18), rgba(76,201,240,0.1));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; margin-bottom: 20px;
+  transition: transform 0.3s;
 }
+.landing__card:hover .landing__card-icon { transform: scale(1.1) rotate(-4deg); }
+.landing__card-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--shn-text); margin-bottom: 10px; }
+.landing__card-desc { font-size: 14px; color: var(--shn-muted); line-height: 1.7; }
 
-/* emoji ikonica na kartici */
-.feature-icon {
-    font-size: 40px;
-    margin-bottom: 16px;
+/* CTA BANNER */
+.landing__cta {
+  padding: 100px 24px; text-align: center;
+  position: relative; overflow: hidden; isolation: isolate;
 }
-
-.feature-card h3 {
-    color: var(--shnare-text);
-    font-size: 20px;
-    margin-bottom: 10px;
+.landing__cta-orb {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 700px; height: 500px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(155,93,229,0.12) 0%, rgba(76,201,240,0.06) 40%, transparent 70%);
+  pointer-events: none;
 }
+.landing__cta-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+.landing__cta-wave { display: flex; align-items: center; justify-content: center; gap: 4px; height: 32px; margin-bottom: 28px; }
+.landing__cta-bar { width: 4px; border-radius: 99px; background: var(--shn-grad); animation: shn-wave 1s ease-in-out infinite; }
+.landing__cta-bar:nth-child(1),.landing__cta-bar:nth-child(7){ height:30%; }
+.landing__cta-bar:nth-child(2),.landing__cta-bar:nth-child(6){ height:55%; }
+.landing__cta-bar:nth-child(3),.landing__cta-bar:nth-child(5){ height:80%; }
+.landing__cta-bar:nth-child(4){ height:100%; }
+.landing__cta-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 800; letter-spacing: -0.03em; color: var(--shn-text); margin-bottom: 16px; }
+.landing__cta-sub { font-size: 16px; color: var(--shn-muted); line-height: 1.7; margin-bottom: 40px; }
+.landing__cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
-.feature-card p {
-    color: var(--shnare-muted);
-    font-size: 14px;
-    line-height: 1.6;
+@media(max-width:1024px){ .landing__grid{ grid-template-columns: repeat(2,1fr); } }
+@media(max-width:640px){
+  .landing__grid{ grid-template-columns:1fr; }
+  .landing__headline{ font-size:2.8rem; }
+  .landing__stats{ gap:28px; }
+  .landing__btn-lg{ padding:13px 24px; font-size:14px; }
+}
+@media(max-width:480px){
+  .landing__btns{ flex-direction:column; align-items:center; }
+  .landing__btn-lg{ width:100%; max-width:280px; justify-content:center; }
 }

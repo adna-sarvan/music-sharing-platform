@@ -1,59 +1,104 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import './Navbar.css';
+import shnareLogo from '../assets/ShnareLogo.jpg';
 
 function Navbar() {
-    // uzimamo korisnika i logout funkciju iz contexta
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-    const handleLogout = () => {
-        logout(); // brišemo korisnika iz contexta i localStorage-a
-        navigate('/'); // vraćamo na početnu
-    };
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    setMenuOpen(false);
+  };
 
-    return (
-        <nav className="navbar">
-            {/* logo / naziv platforme */}
-            <Link to="/" className="navbar-logo">
-                🎵 Shnare
+  const isActive = (path) => location.pathname === path;
+
+  return (
+    <nav className="navbar">
+      <div className="navbar__inner">
+        {/* Logo */}
+        <Link to="/" className="navbar__logo" onClick={() => setMenuOpen(false)}>
+          <img src={shnareLogo} alt="Shnare" className="navbar__logo-img" />
+          <span className="navbar__logo-text">shnare</span>
+        </Link>
+
+        {/* Desktop links */}
+        <div className="navbar__links">
+          <Link to="/browse"  className={`navbar__link ${isActive('/browse')  ? 'navbar__link--active' : ''}`}>Istraži</Link>
+          {user && (
+            <Link to="/upload" className={`navbar__link ${isActive('/upload') ? 'navbar__link--active' : ''}`}>
+              <span className="navbar__link-plus">+</span> Upload
             </Link>
+          )}
+          <Link to="/contact" className={`navbar__link ${isActive('/contact') ? 'navbar__link--active' : ''}`}>Kontakt</Link>
+          {user?.role === 'admin' && (
+            <Link to="/admin" className={`navbar__link navbar__link--admin ${isActive('/admin') ? 'navbar__link--active' : ''}`}>
+              ⚙ Admin
+            </Link>
+          )}
+        </div>
 
-            {/* linkovi u sredini */}
-            <div className="navbar-links">
-                <Link to="/browse">Istraži</Link>
-                <Link to="/upload">+ Dodaj</Link>
-                <Link to="/contact">Kontakt</Link>
+        {/* Auth */}
+        <div className="navbar__auth">
+          {user ? (
+            <>
+              <Link to="/profile" className="navbar__user" onClick={() => setMenuOpen(false)}>
+                <div className="navbar__avatar">
+                  {user.avatar
+                    ? <img src={user.avatar} alt={user.name} />
+                    : <span>{user.name?.charAt(0).toUpperCase()}</span>
+                  }
+                </div>
+                <span className="navbar__user-name">{user.name}</span>
+              </Link>
+              <button className="navbar__logout" onClick={handleLogout}>Odjavi se</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login"    className="navbar__login">Prijavi se</Link>
+              <Link to="/register" className="navbar__register">Registruj se</Link>
+            </>
+          )}
+        </div>
 
-                {/* admin link vidljiv samo adminima */}
-                {user && user.role === 'admin' && (
-                    <Link to="/admin">Admin</Link>
-                )}
-            </div>
+        {/* Hamburger */}
+        <button
+          className={`navbar__burger ${menuOpen ? 'navbar__burger--open' : ''}`}
+          onClick={() => setMenuOpen((p) => !p)}
+          aria-label="Meni"
+        >
+          <span /><span /><span />
+        </button>
+      </div>
 
-            {/* desna strana - login/logout */}
-            <div className="navbar-auth">
-                {user ? (
-                    // ako je prijavljen, pokazujemo mu ime i logout button
-                    <>
-                        <Link to="/profile" className="navbar-username">
-                            👤 {user.name}
-                        </Link>
-                        <button onClick={handleLogout} className="navbar-logout">
-                            Odjavi se
-                        </button>
-                    </>
-                ) : (
-                    // ako nije prijavljen, pokazujemo login i register linkove
-                    <>
-                        <Link to="/login" className="navbar-login">Prijavi se</Link>
-                        <Link to="/register" className="navbar-register">Registruj se</Link>
-                    </>
-                )}
-            </div>
-        </nav>
-    );
+      {/* Mobile menu */}
+      <div className={`navbar__mobile ${menuOpen ? 'navbar__mobile--open' : ''}`}>
+        <Link to="/browse"  className="navbar__mobile-link" onClick={() => setMenuOpen(false)}>Istraži</Link>
+        {user && <Link to="/upload"  className="navbar__mobile-link" onClick={() => setMenuOpen(false)}>+ Upload</Link>}
+        <Link to="/contact" className="navbar__mobile-link" onClick={() => setMenuOpen(false)}>Kontakt</Link>
+        {user?.role === 'admin' && (
+          <Link to="/admin" className="navbar__mobile-link navbar__mobile-link--admin" onClick={() => setMenuOpen(false)}>⚙ Admin</Link>
+        )}
+        <div className="navbar__mobile-divider" />
+        {user ? (
+          <>
+            <Link to="/profile" className="navbar__mobile-link" onClick={() => setMenuOpen(false)}>👤 {user.name}</Link>
+            <button className="navbar__mobile-logout" onClick={handleLogout}>Odjavi se</button>
+          </>
+        ) : (
+          <>
+            <Link to="/login"    className="navbar__mobile-link" onClick={() => setMenuOpen(false)}>Prijavi se</Link>
+            <Link to="/register" className="navbar__mobile-btn"  onClick={() => setMenuOpen(false)}>Registruj se</Link>
+          </>
+        )}
+      </div>
+    </nav>
+  );
 }
 
 export default Navbar;

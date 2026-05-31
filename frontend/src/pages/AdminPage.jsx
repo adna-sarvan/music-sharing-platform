@@ -1,241 +1,263 @@
 import { useState, useEffect } from "react";
+import { supabase } from "../supabaseClient";
 import "./AdminPage.css";
 
 const GENRES = ["Pop", "Rock", "Hip-Hop", "Electronic", "R&B", "Jazz", "Classical", "Indie"];
-const API = "http://localhost:3001/songs";
-
-const emptyForm = { title: "", artist: "", genre: "Pop", duration: "", cover: "" };
+const empty  = { title: "", artist: "", genre: "Pop", duration: "", cover_url: "" };
 
 const AdminPage = () => {
-  const [songs, setSongs] = useState([]);
+  const [songs, setSongs]     = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [form, setForm] = useState(emptyForm);
-  const [editingId, setEditingId] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
+  const [form, setForm]       = useState(empty);
+  const [editId, setEditId]   = useState(null);
+  const [saving, setSaving]   = useState(false);
+  const [toast, setToast]     = useState(null);
+  const [search, setSearch]   = useState("");
 
-  const fetchSongs = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(API);
-      if (!res.ok) throw new Error("Greška pri učitavanju.");
-      const data = await res.json();
-      setSongs(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  const showToast = (msg, type = "success") => { 
+    setToast({ msg, type }); 
+    setTimeout(() => setToast(null), 3200); 
+  };
+
+  // Učitavanje svih pjesama iz Supabase-a
+  const loadSongs = async () => {
+    try { 
+      setLoading(true); 
+      const { data, error } = await supabase
+        .from("songs")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setSongs(data || []); 
+    } catch (err) { 
+      console.error(err);
+      showToast("Greška pri učitavanju podataka.", "error"); 
+    } finally { 
+      setLoading(false); 
     }
   };
 
-  useEffect(() => { fetchSongs(); }, []);
+  useEffect(() => { 
+    loadSongs(); 
+  }, []);
 
-  const showSuccess = (msg) => {
-    setSuccessMsg(msg);
-    setTimeout(() => setSuccessMsg(""), 3000);
-  };
-
+  // Dodavanje ili uređivanje pjesme
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title || !form.artist) return;
+    if (!form.title.trim() || !form.artist.trim()) { 
+      showToast("Naziv i artist su obavezni.", "error"); 
+      return; 
+    }
+    
     setSaving(true);
     try {
-      if (editingId) {
-        const res = await fetch(`${API}/${editingId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...form, id: editingId }),
-        });
-        if (!res.ok) throw new Error("Greška pri ažuriranju.");
-        showSuccess("Pjesma uspješno ažurirana!");
+      if (editId) {
+        // Supabase UPDATE
+        const { error } = await supabase
+          .from("songs")
+          .update({
+            title: form.title.trim(),
+            artist: form.artist.trim(),
+            genre: form.genre,
+            duration: form.duration.trim(),
+            cover_url: form.cover_url.trim()
+          })
+          .eq("id", editId);
+
+        if (error) throw error;
+        showToast("Pjesma ažurirana! ✏️");
       } else {
-        const newId = Date.now().toString();
-        const res = await fetch(API, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...form, id: newId }),
-        });
-        if (!res.ok) throw new Error("Greška pri dodavanju.");
-        showSuccess("Pjesma uspješno dodana!");
+        // Supabase INSERT
+        const { error } = await supabase
+          .from("songs")
+          .insert([
+            {
+              title: form.title.trim(),
+              artist: form.artist.trim(),
+              genre: form.genre,
+              duration: form.duration.trim(),
+              cover_url: form.cover_url.trim(),
+              plays: 0,
+              created_at: new Date().toISOString()
+            }
+          ]);
+
+        if (error) throw error;
+        showToast("Pjesma dodana! ✅");
       }
-      setForm(emptyForm);
-      setEditingId(null);
-      fetchSongs();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSaving(false);
+      
+      setForm(empty); 
+      setEditId(null); 
+      loadSongs();
+    } catch (err) { 
+      console.error(err);
+      showToast("Greška pri spašavanju.", "error"); 
+    } finally { 
+      setSaving(false); 
     }
   };
 
-  const handleEdit = (song) => {
-    setForm({ title: song.title, artist: song.artist, genre: song.genre, duration: song.duration, cover: song.cover || "" });
-    setEditingId(song.id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  // Postavljanje pjesme u formu za edit
+  const handleEdit = (s) => { 
+    setForm({ 
+      title: s.title || "", 
+      artist: s.artist || "", 
+      genre: s.genre || "Pop", 
+      duration: s.duration || "", 
+      cover_url: s.cover_url || s.cover || "" 
+    }); 
+    setEditId(s.id); 
+    window.scrollTo({ top: 0, behavior: "smooth" }); 
   };
 
+  // Brisanje pjesme iz Supabase-a
   const handleDelete = async (id) => {
     if (!window.confirm("Sigurno želiš obrisati ovu pjesmu?")) return;
-    try {
-      const res = await fetch(`${API}/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Greška pri brisanju.");
-      showSuccess("Pjesma obrisana.");
-      fetchSongs();
-    } catch (err) {
-      setError(err.message);
+    try { 
+      const { error } = await supabase
+        .from("songs")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+      showToast("Obrisano! 🗑️"); 
+      loadSongs(); 
+    } catch (err) { 
+      console.error(err);
+      showToast("Greška pri brisanju.", "error"); 
     }
   };
 
-  const handleCancel = () => {
-    setForm(emptyForm);
-    setEditingId(null);
-  };
+  // Filtriranje pjesama kroz pretragu
+  const filtered = songs.filter(s =>
+    s.title?.toLowerCase().includes(search.toLowerCase()) ||
+    s.artist?.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="admin">
-      <div className="admin__header">
-        <h1 className="admin__title">
-          Admin <span className="admin__title-accent">Panel</span>
-        </h1>
-        <p className="admin__subtitle">Upravljaj muzičkim sadržajem platforme</p>
-      </div>
+      {toast && <div className={`shn-toast shn-toast--${toast.type}`}>{toast.type === "success" ? "✓" : "✕"} {toast.msg}</div>}
+      <div className="admin__orb admin__orb--1"/><div className="admin__orb admin__orb--2"/>
 
-      {successMsg && <div className="admin__success">✓ {successMsg}</div>}
-      {error && <div className="admin__error">⚠️ {error}</div>}
-
-      {/* Form */}
-      <div className="admin__form-card">
-        <h2 className="admin__form-title">
-          {editingId ? "✏️ Uredi pjesmu" : "➕ Dodaj novu pjesmu"}
-        </h2>
-        <form onSubmit={handleSubmit} className="admin__form">
-          <div className="admin__form-row">
-            <div className="admin__field">
-              <label className="admin__label">Naziv pjesme *</label>
-              <input
-                className="admin__input"
-                type="text"
-                placeholder="npr. Midnight City"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                required
-              />
-            </div>
-            <div className="admin__field">
-              <label className="admin__label">Izvođač *</label>
-              <input
-                className="admin__input"
-                type="text"
-                placeholder="npr. Neon Lights"
-                value={form.artist}
-                onChange={(e) => setForm({ ...form, artist: e.target.value })}
-                required
-              />
-            </div>
-          </div>
-          <div className="admin__form-row">
-            <div className="admin__field">
-              <label className="admin__label">Žanr</label>
-              <select
-                className="admin__input admin__select"
-                value={form.genre}
-                onChange={(e) => setForm({ ...form, genre: e.target.value })}
-              >
-                {GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
-              </select>
-            </div>
-            <div className="admin__field">
-              <label className="admin__label">Trajanje</label>
-              <input
-                className="admin__input"
-                type="text"
-                placeholder="npr. 3:45"
-                value={form.duration}
-                onChange={(e) => setForm({ ...form, duration: e.target.value })}
-              />
-            </div>
-          </div>
-          <div className="admin__field">
-            <label className="admin__label">URL naslovnice (opciono)</label>
-            <input
-              className="admin__input"
-              type="text"
-              placeholder="https://..."
-              value={form.cover}
-              onChange={(e) => setForm({ ...form, cover: e.target.value })}
-            />
-          </div>
-          <div className="admin__form-actions">
-            {editingId && (
-              <button type="button" className="admin__btn admin__btn--cancel" onClick={handleCancel}>
-                Otkaži
-              </button>
-            )}
-            <button type="submit" className="admin__btn admin__btn--save" disabled={saving}>
-              {saving ? "Čuvanje..." : editingId ? "Sačuvaj izmjene" : "Dodaj pjesmu"}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Songs table */}
-      <div className="admin__table-card">
-        <div className="admin__table-header">
-          <h2 className="admin__form-title">🎵 Sve pjesme</h2>
-          <span className="admin__count">{songs.length} ukupno</span>
+      <div className="admin__inner">
+        <div className="admin__header">
+          <p className="shn-section-label">Admin</p>
+          <h1 className="admin__title">Admin <span className="shn-grad-text">Panel</span></h1>
+          <p className="admin__sub">Upravljaj muzičkim sadržajem Shnare platforme</p>
         </div>
 
-        {loading ? (
-          <div className="admin__loading">
-            <div className="admin__spinner"></div>
-            <p>Učitavanje...</p>
+        {/* Stats row */}
+        <div className="admin__stats">
+          {[
+            { num: songs.length, label: "Ukupno pjesama" },
+            { num: songs.filter(s => (s.plays || 0) >= 1000).length, label: "Popularne (1K+)" },
+            { num: [...new Set(songs.map(s => s.genre))].length, label: "Žanrova" }
+          ].map(({ num, label }) => (
+            <div key={label} className="admin__stat-card">
+              <span className="admin__stat-num shn-grad-text">{num}</span>
+              <span className="admin__stat-label">{label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Form Card */}
+        <div className="admin__form-card shn-card">
+          <h2 className="admin__form-title">{editId ? "✏️ Uredi pjesmu" : "➕ Dodaj novu pjesmu"}</h2>
+          <form onSubmit={handleSubmit} className="admin__form">
+            <div className="admin__row">
+              <div className="contact__field">
+                <label className="upload__label">Naziv *</label>
+                <input className="shn-input" placeholder="npr. Blinding Lights" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} />
+              </div>
+              <div className="contact__field">
+                <label className="upload__label">Artist *</label>
+                <input className="shn-input" placeholder="npr. The Weeknd" value={form.artist} onChange={e => setForm(p => ({ ...p, artist: e.target.value }))} />
+              </div>
+            </div>
+            <div className="admin__row">
+              <div className="contact__field">
+                <label className="upload__label">Žanr</label>
+                <div className="upload__select-wrap">
+                  <select className="shn-input shn-select" value={form.genre} onChange={e => setForm(p => ({ ...p, genre: e.target.value }))}>
+                    {GENRES.map(g => <option key={g}>{g}</option>)}
+                  </select>
+                  <svg className="upload__select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14"><path d="M6 9l6 6 6-6" strokeLinecap="round"/></svg>
+                </div>
+              </div>
+              <div className="contact__field">
+                <label className="upload__label">Trajanje</label>
+                <input className="shn-input" placeholder="npr. 3:45" value={form.duration} onChange={e => setForm(p => ({ ...p, duration: e.target.value }))} />
+              </div>
+            </div>
+            <div className="contact__field">
+              <label className="upload__label">Cover URL (opcionalno)</label>
+              <input className="shn-input" placeholder="https://..." value={form.cover_url} onChange={e => setForm(p => ({ ...p, cover_url: e.target.value }))} />
+            </div>
+            <div className="admin__form-btns">
+              {editId && <button type="button" className="shn-btn shn-btn-ghost" onClick={() => { setForm(empty); setEditId(null); }}>Otkaži</button>}
+              <button type="submit" className="shn-btn shn-btn-primary" disabled={saving}>{saving ? "Sprema..." : editId ? "Sačuvaj izmjene" : "Dodaj pjesmu"}</button>
+            </div>
+          </form>
+        </div>
+
+        {/* Table Card */}
+        <div className="admin__table-card shn-card">
+          <div className="admin__table-head">
+            <h2 className="admin__form-title" style={{ margin: 0 }}>🎵 Sve pjesme</h2>
+            <div className="admin__search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" strokeLinecap="round"/></svg>
+              <input className="admin__search" placeholder="Pretraži..." value={search} onChange={e => setSearch(e.target.value)} />
+            </div>
+            <span className="admin__count">{filtered.length} pjesama</span>
           </div>
-        ) : songs.length === 0 ? (
-          <p className="admin__empty">Nema pjesama. Dodaj prvu!</p>
-        ) : (
-          <div className="admin__table-wrapper">
-            <table className="admin__table">
-              <thead>
-                <tr>
-                  <th>Naslovnica</th>
-                  <th>Naziv</th>
-                  <th>Izvođač</th>
-                  <th>Žanr</th>
-                  <th>Trajanje</th>
-                  <th>Akcije</th>
-                </tr>
-              </thead>
-              <tbody>
-                {songs.map((song) => (
-                  <tr key={song.id} className={editingId === song.id ? "admin__row--editing" : ""}>
-                    <td>
-                      <img
-                        className="admin__cover"
-                        src={song.cover || `https://picsum.photos/seed/${song.id}/40/40`}
-                        alt={song.title}
-                      />
-                    </td>
-                    <td className="admin__cell-title">{song.title}</td>
-                    <td>{song.artist}</td>
-                    <td><span className="admin__genre-tag">{song.genre}</span></td>
-                    <td>{song.duration}</td>
-                    <td>
-                      <div className="admin__actions">
-                        <button className="admin__action-btn admin__action-btn--edit" onClick={() => handleEdit(song)}>
-                          Uredi
-                        </button>
-                        <button className="admin__action-btn admin__action-btn--delete" onClick={() => handleDelete(song.id)}>
-                          Obriši
-                        </button>
-                      </div>
-                    </td>
+
+          {loading ? (
+            <div className="shn-loading"><div className="shn-spinner"/><p style={{ color: "var(--shn-muted)", fontSize: 14 }}>Učitavanje...</p></div>
+          ) : filtered.length === 0 ? (
+            <div className="shn-empty"><p>{search ? "Nema rezultata." : "Nema pjesama. Dodaj prvu!"}</p></div>
+          ) : (
+            <div className="admin__table-wrap">
+              <table className="admin__table">
+                <thead>
+                  <tr>
+                    <th>Cover</th>
+                    <th>Naziv</th>
+                    <th>Artist</th>
+                    <th>Žanr</th>
+                    <th>Plays</th>
+                    <th>Akcije</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody>
+                  {filtered.map(s => (
+                    <tr key={s.id} className={editId === s.id ? "admin__row--editing" : ""}>
+                      <td>
+                        <div className="admin__cover">
+                          {s.cover_url || s.cover ? (
+                            <img src={s.cover_url || s.cover} alt={s.title} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 10 }}/>
+                          ) : (
+                            <span style={{ fontSize: 18 }}>🎵</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="admin__cell-title">{s.title}</td>
+                      <td style={{ color: "var(--shn-muted)" }}>{s.artist}</td>
+                      <td><span className="shn-badge">{s.genre}</span></td>
+                      <td style={{ color: "var(--shn-muted)", fontSize: 13 }}>{(s.plays || 0).toLocaleString()}</td>
+                      <td>
+                        <div className="admin__actions">
+                          <button className="admin__btn admin__btn--edit" onClick={() => handleEdit(s)}>Uredi</button>
+                          <button className="admin__btn admin__btn--del" onClick={() => handleDelete(s.id)}>Obriši</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
