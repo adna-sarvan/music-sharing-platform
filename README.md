@@ -244,7 +244,7 @@ Primjer izlaza:
 ![Admin](screenshots/admin.png)
 
 ### Mobilni prikaz
-![Mobilni](screenshots/mobilna.jpg)
+![Mobilni](screenshots/mobilna_aplikacija.jpg)
 
 ### GCP Cloud Run konzola
 ![GCP](screenshots/gcp.png)
