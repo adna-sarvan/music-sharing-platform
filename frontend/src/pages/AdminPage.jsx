@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import "./AdminPage.css";
+import API from "../config";
 
 const GENRES = ["Pop", "Rock", "Hip-Hop", "Electronic", "R&B", "Jazz", "Classical", "Indie"];
 const empty  = { title: "", artist: "", genre: "Pop", duration: "", cover_url: "" };

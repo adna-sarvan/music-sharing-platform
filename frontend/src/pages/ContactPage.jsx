@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
 import "./ContactPage.css";
+import API from "../config";
 
 const validate = (f) => {
   const e = {};

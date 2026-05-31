@@ -3,6 +3,7 @@ import SongCard from "../components/SongCard";
 import useAuth from "../hooks/useAuth";
 import { supabase } from "../supabaseClient";
 import "./ProfilePage.css";
+import API from "../config";
 
 const TABS = [
   { id: "songs",     label: "Moje pjesme",   icon: "🎵" },

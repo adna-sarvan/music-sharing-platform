@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import "./UploadPage.css";
+import API from "../config";
 // Uvoz createClient da izvučemo sesiju trenutnog korisnika
 import { createClient } from "@supabase/supabase-js";
 

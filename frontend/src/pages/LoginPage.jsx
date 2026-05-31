@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import './LoginPage.css';
+import API from "../config";
 
 function LoginPage() {
     // Stanja za polja forme

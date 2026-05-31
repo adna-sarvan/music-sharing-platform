@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import './LandingPage.css';
+import API from "../config";
 
 const FEATURES = [
   { icon: '🎵', title: 'Upload & Dijeli', desc: 'Objavi svoje pjesme u MP3, WAV ili OGG formatu i dopri do hiljade slušalaca u par klikova.' },

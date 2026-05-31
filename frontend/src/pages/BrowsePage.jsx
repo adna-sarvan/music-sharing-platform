@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import SongCard from "../components/SongCard";
 import "./BrowsePage.css";
 import { supabase } from "../supabaseClient";
+import API from "../config";
 
 const GENRES = ["Sve", "Pop", "Rock", "Hip-Hop", "Electronic", "R&B", "Jazz", "Classical", "Indie"];
 
