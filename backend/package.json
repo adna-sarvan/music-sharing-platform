@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Backend za music-sharing-platform koristi json-server",
   "scripts": {
-    "start": "json-server --watch db.json --port 3000 --middlewares ./cors.js"
+    "start": "json-server --watch db.json --port 3000 --host 0.0.0.0 --cors"
   },
   "dependencies": {
     "cors": "^2.8.6",
