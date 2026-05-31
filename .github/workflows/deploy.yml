@@ -6,13 +6,23 @@ on:
       - main
 
 jobs:
-  check-structure:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Verify Deployment Pipeline Structure
-      run: |
-        echo "Repository structure complies with section 5.1 requirements."
-        echo "Manual CLI deployment active due to IAM restrictions."
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Artifact Registry
+        uses: docker/login-action@v2
+        with:
+          registry: europe-west3-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GCP_SA_KEY }} # OVO MORAŠ DODATI U GITHUB SECRETS
+
+      - name: Build and Push
+        run: |
+          docker build -t europe-west3-docker.pkg.dev/shnare-dws-osiruo-2026/music-sharing-repo/frontend-image:latest ./frontend
+          docker push europe-west3-docker.pkg.dev/shnare-dws-osiruo-2026/music-sharing-repo/frontend-image:latest
