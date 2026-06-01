@@ -26,18 +26,18 @@ jobs:
 
       - name: Build and push frontend image
         run: |
-          docker build -t europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/shnare/frontend:latest ./frontend
-          docker push europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/shnare/frontend:latest
+          docker build -t europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/music-sharing-repo/frontend:latest ./frontend
+          docker push europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/music-sharing-repo/frontend:latest
 
       - name: Build and push backend image
         run: |
-          docker build -t europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/shnare/backend:latest ./backend
-          docker push europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/shnare/backend:latest
+          docker build -t europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/music-sharing-repo/backend:latest ./backend
+          docker push europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/music-sharing-repo/backend:latest
 
       - name: Deploy frontend to Cloud Run
         run: |
           gcloud run deploy shnare-frontend \
-            --image europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/shnare/frontend:latest \
+            --image europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/music-sharing-repo/frontend:latest \
             --platform managed \
             --region europe-west3 \
             --allow-unauthenticated
@@ -45,7 +45,7 @@ jobs:
       - name: Deploy backend to Cloud Run
         run: |
           gcloud run deploy shnare-backend \
-            --image europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/shnare/backend:latest \
+            --image europe-west3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/music-sharing-repo/backend:latest \
             --platform managed \
             --region europe-west3 \
             --allow-unauthenticated
