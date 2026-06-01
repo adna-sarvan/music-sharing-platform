@@ -25,13 +25,13 @@ jobs:
       - name: Deploy frontend to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: frontend-service
+          service: shnare-frontend
           region: europe-west3
           source: ./frontend
 
       - name: Deploy backend to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: backend-service
+          service: shnare-backend
           region: europe-west3
           source: ./backend
